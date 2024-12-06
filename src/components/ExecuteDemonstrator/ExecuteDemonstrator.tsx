@@ -10,6 +10,7 @@ import {
     Splitter,
     Flex,
     Typography,
+    Divider,
 } from "antd";
 import { blue } from "@ant-design/colors";
 import { CloseOutlined } from "@ant-design/icons";
@@ -39,6 +40,7 @@ function ExecuteDemonstrator() {
 
     const { token } = useToken();
     const [code, setCode] = useState<string>("");
+    const [currentLine, setCurrentLine] = useState<number>(0);
     const demonstrator = TExecuteDemonstrator;
 
     const handleCodeChange: (event: SyntheticEvent) => void = (event) => {
@@ -46,6 +48,10 @@ function ExecuteDemonstrator() {
         const target = event.target as HTMLInputElement;
         setCode(target.value);
     };
+    const handleNextLine: (envet: SyntheticEvent) => void = (event) => {
+        // TODO: 处理点击按钮进入下一行的代码.
+        console.log(event);
+    }
     return (
         <div>
             <Form layout="vertical" name="code-input">
@@ -72,7 +78,7 @@ function ExecuteDemonstrator() {
                 >
                     参数:
                 </div>
-                <Form.Item label="List">
+                <Form.Item>
                     <Form.List name="item">
                         {(fields, opt) => (
                             <div
@@ -104,6 +110,7 @@ function ExecuteDemonstrator() {
                                                 <Input placeholder="说明" />
                                             </Form.Item>
                                             <Space key={`${field.key}_var`}>
+                                                <Divider type="vertical" />
                                                 <Form.Item
                                                     noStyle
                                                     name={[
@@ -207,6 +214,7 @@ function ExecuteDemonstrator() {
 
             <Splitter
                 style={{
+                    minHeight: "150px",
                     boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
                 }}
             >
