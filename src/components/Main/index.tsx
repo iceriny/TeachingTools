@@ -1,13 +1,10 @@
 import React from "react";
 import { Layout, Menu, theme } from "antd";
-import TExecuteDemonstrator from "../../Tools/TExecuteDemonstrator";
 import Tool from "../../Tools/BaseTool";
 
 import ExecuteDemonstrator from "../ExecuteDemonstrator";
 
 const { Header, Content, Footer, Sider } = Layout;
-
-TExecuteDemonstrator.getInstance(TExecuteDemonstrator);
 
 const items = Tool.getAllToolsList().map((tool, index) => ({
     key: `nav_${index + 1}`,

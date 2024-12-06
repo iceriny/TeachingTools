@@ -39,7 +39,7 @@ function ExecuteDemonstrator() {
 
     const { token } = useToken();
     const [code, setCode] = useState<string>("");
-    const demonstrator = TExecuteDemonstrator.getInstance();
+    const demonstrator = TExecuteDemonstrator;
 
     const handleCodeChange: (event: SyntheticEvent) => void = (event) => {
         if (!event) return;

@@ -27,5 +27,5 @@ class TExecuteDemonstrator extends Tool {
 
     }
 }
-
-export default TExecuteDemonstrator;
+const instance = TExecuteDemonstrator.getInstance();
+export default instance as TExecuteDemonstrator;
