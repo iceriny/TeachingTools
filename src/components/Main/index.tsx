@@ -1,33 +1,25 @@
 import React from "react";
 import { Layout, Menu, theme } from "antd";
-import ExecuteDemonstrator from "../../Tools/ExecuteDemonstrator";
+import TExecuteDemonstrator from "../../Tools/TExecuteDemonstrator";
 import Tool from "../../Tools/BaseTool";
 
-import SyntaxHighlighter from "react-syntax-highlighter";
+import ExecuteDemonstrator from "../ExecuteDemonstrator";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-ExecuteDemonstrator.getInstance(ExecuteDemonstrator);
+TExecuteDemonstrator.getInstance(TExecuteDemonstrator);
 
 const items = Tool.getAllToolsList().map((tool, index) => ({
     key: `nav_${index + 1}`,
     icon: React.createElement(tool.getIcon()),
     label: tool.label,
 }));
-const content = `#include<iostream>
-using namespace std;
-int main() {
-    cout << "hellom world!" << endl;
-    return 0;
-}`;
+
 function Main() {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    const handleLineClick = (lineNumber: number) => {
-        console.log(lineNumber);
-    };
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <Sider
@@ -59,18 +51,8 @@ function Main() {
                             borderRadius: borderRadiusLG,
                         }}
                     >
-                        content
-                        <SyntaxHighlighter
-                            language="cpp"
-                            showLineNumbers={true}
-                            wrapLines={true} // 必须启用以支持逐行包装
-                            lineProps={(lineNumber) => ({
-                                onClick: () => handleLineClick(lineNumber),
-                                style: { cursor: "pointer" }, // 可选：样式设置
-                            })}
-                        >
-                            {content}
-                        </SyntaxHighlighter>
+                        <ExecuteDemonstrator />
+
                     </div>
                 </Content>
                 <Footer style={{ textAlign: "center" }}>

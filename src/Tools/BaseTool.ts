@@ -51,19 +51,6 @@ class Tool {
         }
     }
 
-    // public static registerTool(...tools: ConstructorObjectList) {
-    //     if (!Tool.registeredTools) {
-    //         Tool.registeredTools = tools;
-    //     }
-    //     Tool.registeredTools.concat(tools);
-    // }
-
-    // public static instantiation() {
-    //     for (const tool of Tool.registeredTools) {
-    //         console.log(typeof tool.constructor);
-    //         tool.constructor.getInstance(...(tool.args ?? [])); // ts-ignore
-    //     }
-    // }
 
     /** 工具的显示名 */
     public label: string;

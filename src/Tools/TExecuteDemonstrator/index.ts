@@ -11,7 +11,7 @@ interface CodeBlocksData {
     steps: number[];
     params: CodeBlocksParams[];
 }
-class ExecuteDemonstrator extends Tool {
+class TExecuteDemonstrator extends Tool {
     codeBlocksData: CodeBlocksData;
     currentStep = 0;
     constructor() {
@@ -28,4 +28,4 @@ class ExecuteDemonstrator extends Tool {
     }
 }
 
-export default ExecuteDemonstrator;
+export default TExecuteDemonstrator;
