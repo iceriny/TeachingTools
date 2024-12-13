@@ -1,8 +1,11 @@
 import { SwapOutlined } from "@ant-design/icons";
 import type { Class } from "type-fest";
 
-type ToolsLabel = "程序执行演示器";
-type ToolIconName = "SwapOutlined";
+import DiceIcon from "./ToolIcon/DiceIcon";
+
+type ToolsLabel = "程序执行演示器" | "骰子工具";
+type ToolName = "DiceTool" | "ExecuteDemonstrator";
+type ToolIconName = "SwapOutlined" | "DiceIcon";
 
 /**
  * 工具逻辑类的基类, 已实现单例模式, 用`getInstance`获取实例
@@ -46,25 +49,30 @@ class Tool {
         switch (this._iconName) {
             case "SwapOutlined":
                 return SwapOutlined;
+            case "DiceIcon":
+                return DiceIcon;
             default:
                 return SwapOutlined;
         }
     }
 
-
     /** 工具的显示名 */
-    public label: string;
+    public label: ToolsLabel;
+    public name: ToolName;
     protected _iconName: ToolIconName;
     protected enabled: boolean;
     protected constructor(
         label: ToolsLabel,
+        name: ToolName,
         iconName: ToolIconName,
         enabled: boolean = true
     ) {
         this.label = label;
         this._iconName = iconName;
         this.enabled = enabled;
+        this.name = name;
     }
 }
 
 export default Tool;
+export type { ToolsLabel, ToolName, ToolIconName };

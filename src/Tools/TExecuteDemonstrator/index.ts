@@ -15,7 +15,7 @@ class TExecuteDemonstrator extends Tool {
     codeBlocksData: CodeBlocksData;
     currentStep = 0;
     constructor() {
-        super("程序执行演示器", "SwapOutlined");
+        super("程序执行演示器", "ExecuteDemonstrator", "SwapOutlined");
         this.codeBlocksData = { code: [], steps: [], params: [] };
     }
 
