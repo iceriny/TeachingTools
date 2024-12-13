@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, Dropdown, Flex, Space, MenuProps, Popconfirm } from "antd";
+import { Card, Dropdown, Flex, Space, Popconfirm, message } from "antd";
+import type { MenuProps } from "antd";
 
 import Dice from "./Dice/Dice";
 import "./DiceTool.css";
@@ -18,6 +19,7 @@ function DiceTool() {
     const [dices, setDices] = useState<Array<number>>([]);
     const [dicesStage, setDicesStage] = useState<Array<boolean>>([]);
     const [sums, setSums] = useState<DiceSum[]>([]);
+    const [messageApi, contextHolder] = message.useMessage();
     const HandleRollClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         setDices([...dices, Math.floor(Math.random() * 20) + 1]);
@@ -33,13 +35,18 @@ function DiceTool() {
         newDicesStage[index] = !newDicesStage[index];
         setDicesStage(newDicesStage);
     };
-    const HandleCancleSelect = () => {
+    const HandleCancelSelect = () => {
         setDicesStage(dicesStage.map(() => false));
     };
     const HandleSumClick = (event: React.MouseEvent) => {
         event.stopPropagation();
-        if (dices.length == 0) { // <!DOCTYPE html>
-            alert("请先投掷骰子");
+        if (dices.length === 0) {
+            messageApi.warning("请先投掷骰子");
+            return;
+        }
+        const SelectDiceCount = dicesStage.filter((dice) => dice).length;
+        if (SelectDiceCount == 0) {
+            messageApi.warning("请先选择骰子");
             return;
         }
         let sum = 0;
@@ -81,7 +88,8 @@ function DiceTool() {
         }
     };
     return (
-        <Flex onDoubleClick={HandleCancleSelect}>
+        <Flex onDoubleClick={HandleCancelSelect}>
+            {contextHolder}
             <Flex
                 style={{ width: "60%", marginRight: "20px" }}
                 vertical
@@ -178,7 +186,7 @@ function DiceTool() {
                 {sums.map((sum, index) => {
                     return (
                         <Card
-                        style={{ maxHeight: "200px"}}
+                            style={{ maxHeight: "200px" }}
                             key={index}
                             title={`骰子: ${sum.dices.join("+")}`}
                         >

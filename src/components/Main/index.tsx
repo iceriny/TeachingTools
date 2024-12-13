@@ -3,8 +3,8 @@ import { Layout, Menu, MenuProps, theme } from "antd";
 import Tool from "../../Tools/BaseTool";
 import { ToolName } from "../../Tools/BaseTool";
 
-import ExecuteDemonstrator from "../ExecuteDemonstrator";
 import DiceTool from "../DiceTool";
+import ExecuteDemonstrator from "../ExecuteDemonstrator";
 
 const { /* Header, */ Content, Footer, Sider } = Layout;
 
@@ -14,14 +14,15 @@ const items = Tool.getAllToolsList().map((tool) => ({
     label: tool.label,
 }));
 
-type PageName = `nav_${ToolName}`
+type PageName = `nav_${ToolName}`;
 
 function Main() {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    const [currentPage, setCurrentPage] = React.useState<PageName>("nav_ExecuteDemonstrator");
+    const [currentPage, setCurrentPage] =
+        React.useState<PageName>("nav_DiceTool");
     const GetPage = (key: PageName) => {
         switch (key) {
             case "nav_ExecuteDemonstrator":
@@ -32,7 +33,9 @@ function Main() {
                 return <div>Not Found</div>;
         }
     };
-    const HandleMenuClick: MenuProps["onClick"] = ({ key, /* keyPath, domEvent */ }) => {
+    const HandleMenuClick: MenuProps["onClick"] = ({
+        key /* keyPath, domEvent */,
+    }) => {
         setCurrentPage(key as PageName);
     };
     return (
@@ -47,13 +50,13 @@ function Main() {
                 onCollapse={(collapsed, type) => {
                     console.log(collapsed, type);
                 }}
-                style={{ padding: "5px"}}
+                style={{ padding: "5px" }}
             >
                 {/* <div className="demo-logo-vertical" /> */}
                 <Menu
                     theme="light"
                     mode="inline"
-                    defaultSelectedKeys={["nav_ExecuteDemonstrator"]}
+                    defaultSelectedKeys={[currentPage]}
                     items={items}
                     onClick={HandleMenuClick}
                 />
@@ -64,7 +67,7 @@ function Main() {
                     <div
                         style={{
                             padding: 24,
-                            minHeight: 700,
+                            minHeight: 900,
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}
