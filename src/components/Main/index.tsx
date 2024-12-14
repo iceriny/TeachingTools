@@ -4,6 +4,7 @@ import Tool from "../../Tools/BaseTool";
 import { ToolName } from "../../Tools/BaseTool";
 
 import DiceTool from "../DiceTool";
+import RandomGenerator from "../RandomGenerator/RandomGenerator";
 import ExecuteDemonstrator from "../ExecuteDemonstrator";
 
 const { /* Header, */ Content, Footer, Sider } = Layout;
@@ -29,6 +30,8 @@ function Main() {
                 return <ExecuteDemonstrator />;
             case "nav_DiceTool":
                 return <DiceTool />;
+            case "nav_RandomGenerator":
+                return <RandomGenerator />;
             default:
                 return <div>Not Found</div>;
         }

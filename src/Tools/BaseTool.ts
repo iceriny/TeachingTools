@@ -1,11 +1,11 @@
-import { SwapOutlined } from "@ant-design/icons";
+import { SwapOutlined, TrademarkOutlined } from "@ant-design/icons";
 import type { Class } from "type-fest";
 
 import DiceIcon from "./ToolIcon/DiceIcon";
 
-type ToolsLabel = "程序执行演示器" | "骰子工具";
-type ToolName = "DiceTool" | "ExecuteDemonstrator";
-type ToolIconName = "SwapOutlined" | "DiceIcon";
+type ToolsLabel = "骰子工具" | "程序执行演示器" | "随机生成器";
+type ToolName = "DiceTool" | "ExecuteDemonstrator" | "RandomGenerator";
+type ToolIconName = "SwapOutlined" | "DiceIcon" | "TrademarkOutlined";
 
 /**
  * 工具逻辑类的基类, 已实现单例模式, 用`getInstance`获取实例
@@ -51,6 +51,8 @@ class Tool {
                 return SwapOutlined;
             case "DiceIcon":
                 return DiceIcon;
+            case "TrademarkOutlined":
+                return TrademarkOutlined;
             default:
                 return SwapOutlined;
         }
