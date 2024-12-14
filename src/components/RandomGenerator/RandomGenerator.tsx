@@ -182,6 +182,7 @@ function RandomGenerator() {
                 </Space>
                 <Divider />
                 <Space wrap>
+                    {/* TODO: 将value使用 `Statistic` 组件显示 给数值添加动画进入效果， => react-countup */}
                     {randomResults.map((result, index) =>
                         Array.isArray(result.value) ? (
                             <Card key={`${index}_${result.value[0] || "item"}`}>
