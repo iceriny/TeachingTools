@@ -1,7 +1,7 @@
 import { Card, Space, theme } from "antd";
-import Tool from "../../Tools/BaseTool";
+import Tool from "../../../Tools/BaseTool";
 import React from "react";
-import type { PageName } from "../Main";
+import type { PageName } from "../../Main";
 
 const items = Tool.getAllToolsList();
 const { useToken } = theme;

@@ -5,9 +5,8 @@ import { QuestionOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
 import Dice from "./Dice/Dice";
-import "./DiceTool.css";
 
-import TDiceTool from "../../Tools/TDiceTool";
+import TDiceTool from "../../../Tools/TDiceTool";
 
 interface DiceSum {
     dices: Array<number>;
@@ -46,8 +45,9 @@ function DiceTool() {
             return;
         }
         const SelectDiceCount = dicesStage.filter((dice) => dice).length;
-        if (SelectDiceCount == 0) {
-            messageApi.warning("请先选择骰子");
+        if (SelectDiceCount < 2) {
+            if (SelectDiceCount === 0) messageApi.warning("请先选择骰子");
+            else messageApi.warning("请至少选择两个骰子");
             return;
         }
         let sum = 0;

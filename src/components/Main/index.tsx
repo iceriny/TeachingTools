@@ -5,13 +5,13 @@ import Tool, { ToolName } from "../../Tools/BaseTool";
 
 // 菜单显示顺序依赖于 Tool.getAllTools()
 // 导入顺序即为菜单显示顺序
-import DiceTool from "../DiceTool";
-import ExecuteDemonstrator from "../ExecuteDemonstrator";
-import RandomGenerator from "../RandomGenerator";
+import DiceTool from "../Page/DiceTool";
+import ExecuteDemonstrator from "../Page/ExecuteDemonstrator";
+import RandomGenerator from "../Page/RandomGenerator";
 
 // Home中卡片的显示也依赖于上面的导入顺序, 因此需要保证以上顺序
 // Home 的导入必须在 Tool 类之后导入
-import Home from "../Home";
+import Home from "../Page/Home";
 
 const { Content, Footer, Sider } = Layout;
 

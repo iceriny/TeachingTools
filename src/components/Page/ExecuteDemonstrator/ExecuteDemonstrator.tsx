@@ -18,7 +18,7 @@ import {
 import type { FormProps, MenuProps } from "antd";
 import React, { SyntheticEvent, useState } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import TExecuteDemonstrator from "../../Tools/TExecuteDemonstrator";
+import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
 
 const { useToken } = theme;
 

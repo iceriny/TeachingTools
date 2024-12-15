@@ -16,7 +16,7 @@ import type { MenuProps, StatisticProps } from "antd";
 import { useState } from "react";
 
 import { valueType } from "antd/es/statistic/utils";
-import TRandomGenerator from "../../Tools/TRandomGenerator";
+import TRandomGenerator from "../../../Tools/TRandomGenerator";
 
 type randomType =
     | "int"
