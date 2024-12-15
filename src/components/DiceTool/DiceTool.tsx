@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, Dropdown, Flex, Space, Popconfirm, message } from "antd";
+import { Card, Dropdown, Flex, Space, Popconfirm, message, Button } from "antd";
+import { QuestionOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
 import Dice from "./Dice/Dice";
@@ -151,6 +152,7 @@ function DiceTool() {
                     </Dropdown.Button>
                     <Popconfirm
                         title="Help"
+                        icon={<QuestionCircleOutlined />}
                         description={() => (
                             <>
                                 <p>
@@ -176,9 +178,7 @@ function DiceTool() {
                         okText="Yes"
                         cancelText="No"
                     >
-                        <div id="help" className="help-button">
-                            ?
-                        </div>
+                        <Button type="link" icon={<QuestionOutlined />} />
                     </Popconfirm>
                 </Space>
             </Flex>

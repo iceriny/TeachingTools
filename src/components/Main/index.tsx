@@ -1,13 +1,19 @@
 import React from "react";
+// import { BankOutlined } from "@ant-design/icons";
 import { Layout, Menu, MenuProps, theme } from "antd";
-import Tool from "../../Tools/BaseTool";
-import { ToolName } from "../../Tools/BaseTool";
+import Tool, { ToolName } from "../../Tools/BaseTool";
 
+// 菜单显示顺序依赖于 Tool.getAllTools()
+// 导入顺序即为菜单显示顺序
 import DiceTool from "../DiceTool";
-import RandomGenerator from "../RandomGenerator";
 import ExecuteDemonstrator from "../ExecuteDemonstrator";
+import RandomGenerator from "../RandomGenerator";
 
-const { /* Header, */ Content, Footer, Sider } = Layout;
+// Home中卡片的显示也依赖于上面的导入顺序, 因此需要保证以上顺序
+// Home 的导入必须在 Tool 类之后导入
+import Home from "../Home";
+
+const { Content, Footer, Sider } = Layout;
 
 const items = Tool.getAllToolsList().map((tool) => ({
     key: `nav_${tool.name}`,
@@ -15,15 +21,20 @@ const items = Tool.getAllToolsList().map((tool) => ({
     label: tool.label,
 }));
 
-type PageName = `nav_${ToolName}`;
-
+export type PageName = `nav_${ToolName}` | "nav_Home";
+const contentSizeData = { padding: 24, minHeight: 900 };
 function Main() {
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: {
+            colorBgContainer,
+            borderRadiusLG,
+            // colorPrimary,
+            // colorText,
+            // colorBgTextHover,
+        },
     } = theme.useToken();
 
-    const [currentPage, setCurrentPage] =
-        React.useState<PageName>("nav_DiceTool");
+    const [currentPage, setCurrentPage] = React.useState<PageName>("nav_Home");
     const GetPage = (key: PageName) => {
         switch (key) {
             case "nav_ExecuteDemonstrator":
@@ -33,7 +44,13 @@ function Main() {
             case "nav_RandomGenerator":
                 return <RandomGenerator />;
             default:
-                return <div>Not Found</div>;
+                return (
+                    <Home
+                        contentMinHeight={contentSizeData.minHeight}
+                        contentPadding={contentSizeData.padding}
+                        cardClickCallback={setCurrentPage}
+                    />
+                );
         }
     };
     const HandleMenuClick: MenuProps["onClick"] = ({
@@ -55,7 +72,34 @@ function Main() {
                 }}
                 style={{ padding: "5px" }}
             >
-                {/* <div className="demo-logo-vertical" /> */}
+                {/* <div
+                    style={{
+                        width: "100%",
+                        height: "60px",
+                        background: colorBgContainer,
+                        borderRadius: borderRadiusLG,
+                        marginBottom: "10px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        transition:
+                            "color .5s ease-in-out, background .5s ease-in-out",
+                    }}
+                    onClick={() => {
+                        setCurrentPage("nav_Home");
+                    }}
+                    onMouseEnter={(event) => {
+                        event.currentTarget.style.color = colorPrimary;
+                        event.currentTarget.style.background = colorBgTextHover;
+                    }}
+                    onMouseLeave={(event) => {
+                        event.currentTarget.style.color = colorText;
+                        event.currentTarget.style.background = colorBgContainer;
+                    }}
+                >
+                    <BankOutlined style={{ fontSize: "1.5rem" }} />
+                </div> */}
                 <Menu
                     theme="light"
                     mode="inline"
@@ -65,12 +109,10 @@ function Main() {
                 />
             </Sider>
             <Layout>
-                {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
                 <Content style={{ margin: "24px 16px 0" }}>
                     <div
                         style={{
-                            padding: 24,
-                            minHeight: 900,
+                            ...contentSizeData,
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}

@@ -61,6 +61,7 @@ class Tool {
     /** 工具的显示名 */
     public label: ToolsLabel;
     public name: ToolName;
+    public description: string = "DevInfo: 请填写描述!";
     protected _iconName: ToolIconName;
     protected enabled: boolean;
     protected constructor(

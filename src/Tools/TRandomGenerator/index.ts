@@ -3,13 +3,14 @@ import Tool from "../BaseTool";
 class TRandomGenerator extends Tool {
     constructor() {
         super("随机生成器", "RandomGenerator", "TrademarkOutlined");
+        this.description = "用于生成随机数的工具.";
     }
 
     get rand() {
         return Math.random();
     }
     public getRandomFloat(min: number, max: number) {
-        return (Math.random() * (max - min) + min);
+        return Math.random() * (max - min) + min;
     }
     public getRandomInt(min: number, max: number) {
         min = Math.ceil(min);
@@ -23,11 +24,7 @@ class TRandomGenerator extends Tool {
         }
         return arr;
     }
-    public getRandomFloatArray(
-        min: number,
-        max: number,
-        length: number,
-    ) {
+    public getRandomFloatArray(min: number, max: number, length: number) {
         const arr = [];
         for (let i = 0; i < length; i++) {
             arr.push(this.getRandomFloat(min, max));
@@ -35,34 +32,29 @@ class TRandomGenerator extends Tool {
         return arr;
     }
     public getIntRandomFromGroup(min: number, max: number, group: number) {
-        const numCount = max - min + 1;
-        const numberOfEnhancedGroups = numCount % group;
-        const groupSize = Math.ceil(numCount / group);
-        const groups: number[][] = [];
-        for (let i = 0; i < group; i++) {
-            const group: number[] = [];
-            for (
-                let j = 0;
-                j < (i < numberOfEnhancedGroups ? groupSize + 1 : groupSize);
-                j++
-            ) {
-                group.push(min + j + i * groupSize);
+        const range = max - min;
+        const numberOfEnhancedGroups = range % group;
+        const edge = Math.ceil(range / group);
+        const result: number[] = [];
+        for (let i = 1; i <= group; i++) {
+            if (i <= numberOfEnhancedGroups) {
+                result.push(this.getRandomInt(min, edge * i + 1));
+                min = edge * i + 1;
+            } else {
+                result.push(this.getRandomInt(min, edge * i));
+                min = edge * i;
             }
-            groups.push(group);
         }
-
-        return groups.map((group) => group[Math.floor(Math.random() * group.length)]);
+        return result;
     }
-    public getFloatRandomFromGroup(
-        min: number,
-        max: number,
-        group: number,
-    ) {
-        const numCount = max - min + 1;
-        const edge = numCount / group;
-        const result:number[] = [];
-        for (let i = 0; i < group; i++) {
-            result.push(this.getRandomFloat(min, edge * (i +1)));
+    public getFloatRandomFromGroup(min: number, max: number, group: number) {
+        const range = max - min;
+        const GroupRange = range / group;
+        const result: number[] = [];
+        for (let i = 1; i <= group; i++) {
+            const nextEdge = GroupRange * i;
+            result.push(this.getRandomFloat(min, nextEdge));
+            min = nextEdge;
         }
 
         return result;

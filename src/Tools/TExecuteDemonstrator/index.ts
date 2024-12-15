@@ -28,6 +28,8 @@ class TExecuteDemonstrator extends Tool {
     _currentLine = 0;
     constructor(data: TExecuteDemonstratorProps) {
         super("程序执行演示器", "ExecuteDemonstrator", "SwapOutlined");
+        this.description =
+            "输入程序代码, 并且录入各种数据, 可以展示程序执行过程.";
         this._code = data.code;
         this._codeLine = data.code.split("\n");
         this.steps = data.steps;
