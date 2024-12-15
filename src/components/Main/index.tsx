@@ -4,7 +4,7 @@ import Tool from "../../Tools/BaseTool";
 import { ToolName } from "../../Tools/BaseTool";
 
 import DiceTool from "../DiceTool";
-import RandomGenerator from "../RandomGenerator/RandomGenerator";
+import RandomGenerator from "../RandomGenerator";
 import ExecuteDemonstrator from "../ExecuteDemonstrator";
 
 const { /* Header, */ Content, Footer, Sider } = Layout;
