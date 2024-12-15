@@ -21,7 +21,7 @@ const getVersionDesc = () => {
     for (const key in VERSION_DATA) {
         if (key === "last") continue;
         const updateMask = compareVersions(key, OLD_VERSION);
-        if (updateMask === 1 || updateMask === 0) {
+        if (updateMask === 1) {
             // 更新日志显示:
             const data = VERSION_DATA[key as VersionNumber];
             result.push({ version: key as VersionNumber, desc: data.desc });
