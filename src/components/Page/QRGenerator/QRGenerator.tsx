@@ -2,6 +2,8 @@ import React, { useState } from "react";
 
 import TQRGenerator from "../../../Tools/TQRGenerator";
 
+import { UploadOutlined } from "@ant-design/icons";
+import type { ButtonProps, RadioChangeEvent, SliderSingleProps } from "antd";
 import {
     Button,
     ColorPicker,
@@ -11,10 +13,7 @@ import {
     Slider,
     Space,
     Typography,
-    Upload,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import type { ButtonProps, RadioChangeEvent, SliderSingleProps } from "antd";
 
 function doDownload(url: string, fileName: string) {
     const a = document.createElement("a");
