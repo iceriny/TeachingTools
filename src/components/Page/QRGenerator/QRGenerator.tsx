@@ -2,8 +2,7 @@ import React, { useState } from "react";
 
 import TQRGenerator from "../../../Tools/TQRGenerator";
 
-import { UploadOutlined } from "@ant-design/icons";
-import type { ButtonProps, RadioChangeEvent, SliderSingleProps } from "antd";
+import type { RadioChangeEvent, SliderSingleProps } from "antd";
 import {
     Button,
     ColorPicker,
@@ -18,8 +17,8 @@ import {
     Tooltip,
     Typography,
 } from "antd";
-import QRParse from "./QRParse";
 import InputFile from "../../InputFile";
+import QRParse from "./QRParse";
 
 function doDownload(url: string, fileName: string) {
     const a = document.createElement("a");
