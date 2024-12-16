@@ -9,9 +9,9 @@
 
 ### 快速开始
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/7b11915d-ef16-47de-a5e2-8bd3a776e19b/deploy-status)](https://app.netlify.com/sites/teachingtool/deploys)
+-   [![Netlify Status](https://api.netlify.com/api/v1/badges/7b11915d-ef16-47de-a5e2-8bd3a776e19b/deploy-status)](https://app.netlify.com/sites/teachingtool/deploys)
 
-1. 打开 [TeachingTools](https://teachingtool.netlify.app/) 页面。
+1. 打开 >[TeachingTools](https://teachingtool.netlify.app/)< 页面。
 2. 选择所需的工具并按照提示操作。
 
 ---
