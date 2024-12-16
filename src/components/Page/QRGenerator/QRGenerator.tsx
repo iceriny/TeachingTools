@@ -8,12 +8,18 @@ import {
     Button,
     ColorPicker,
     Input,
+    InputNumber,
+    message,
+    Modal,
     QRCode,
     Radio,
     Slider,
     Space,
+    Tooltip,
     Typography,
 } from "antd";
+import QRParse from "./QRParse";
+import InputFile from "../../InputFile";
 
 function doDownload(url: string, fileName: string) {
     const a = document.createElement("a");
@@ -93,12 +99,15 @@ function QRGenerator({
     contentPadding: number;
 }) {
     const Tool = TQRGenerator;
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [messageApi, contextHolder] = message.useMessage();
+    const otherQrContentRef = React.useRef<string>();
     const [qrContent, setQRContent] = useState<string>();
     const [qrType, setQRType] = useState<"svg" | "canvas">("svg");
     const [qrColor, setQRColor] = useState<string>();
     const [qrIcon, setQRIcon] = useState<{ src: string; name: string }>();
+    const [qrIconSize, setQRIconSize] = useState<number>();
     const [level, setLevel] = useState<"L" | "M" | "Q" | "H">("M");
+    const [isParseQROpen, setIsParseQROpen] = useState(false);
     const onTypeChange = ({ target: { value } }: RadioChangeEvent) => {
         setQRType(value);
     };
@@ -110,21 +119,11 @@ function QRGenerator({
         }
     };
 
-    const onUploadIconClick: ButtonProps["onClick"] = () => {
-        fileInputRef.current?.click();
-    };
-    const handleUploadIcon = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setQRIcon({
-                    src: reader.result as string,
-                    name: file?.name || "未选择",
-                }); // 将图片的Base64 URL存储到状态
-            };
-            reader.readAsDataURL(file);
-        }
+    const handleUploadIcon = (fileName: string, result: string) => {
+        setQRIcon({
+            src: result,
+            name: fileName || "未选择",
+        }); // 将图片的Base64 URL存储到状态
     };
     return (
         <div
@@ -136,6 +135,7 @@ function QRGenerator({
                 alignItems: "center",
             }}
         >
+            {contextHolder}
             <Space direction="vertical" size={30} align="center">
                 <Typography.Title level={3}>{Tool.label}</Typography.Title>
                 <div id="qr-code-display">
@@ -144,6 +144,7 @@ function QRGenerator({
                         value={qrContent || "请输入内容"}
                         type={qrType}
                         color={qrColor}
+                        iconSize={qrIconSize}
                         icon={qrIcon?.src}
                         errorLevel={level}
                     />
@@ -166,46 +167,96 @@ function QRGenerator({
                     />
                     <Button onClick={onClickDownload}>下载</Button>
                 </Space>
-                <Slider
-                    style={{
-                        width: "500px",
-                    }}
-                    marks={{ 0: "低", 33: "中", 66: "较高", 100: "高" }}
-                    step={null}
-                    tooltip={{ formatter }}
-                    defaultValue={33}
-                    onChange={(e) => {
-                        const level =
-                            e === 0
-                                ? "L"
-                                : e === 33
-                                ? "M"
-                                : e === 66
-                                ? "Q"
-                                : "H";
-                        console.log(level);
-                        setLevel(level);
-                    }}
-                />
-                <Button icon={<UploadOutlined />} onClick={onUploadIconClick}>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        style={{ display: "none" }}
+                <Space direction="vertical" align="center">
+                    <Typography.Text>容错率</Typography.Text>
+                    <Slider
+                        style={{
+                            width: "500px",
+                        }}
+                        marks={{ 0: "低", 33: "中", 66: "较高", 100: "高" }}
+                        step={null}
+                        tooltip={{ formatter }}
+                        defaultValue={33}
+                        onChange={(e) => {
+                            const level =
+                                e === 0
+                                    ? "L"
+                                    : e === 33
+                                    ? "M"
+                                    : e === 66
+                                    ? "Q"
+                                    : "H";
+                            console.log(level);
+                            setLevel(level);
+                        }}
+                    />
+                </Space>
+                <Space>
+                    <InputFile
+                        title={qrIcon?.name || "自定义图标"}
                         onChange={handleUploadIcon}
                     />
-                    {qrIcon?.name || "自定义图标"}
-                </Button>
-                <Input
-                    placeholder="请输入内容"
-                    allowClear
-                    size="large"
-                    addonBefore="二维码中的内容: "
-                    type="text"
-                    onChange={(e) => {
-                        setQRContent(e.target.value);
-                    }}
-                />
+                    {qrIcon?.name && (
+                        <InputNumber
+                            style={{ width: "140px" }}
+                            addonBefore="图标大小"
+                            defaultValue={32}
+                            onChange={(e) => {
+                                setQRIconSize(e || 32);
+                            }}
+                        />
+                    )}
+                </Space>
+                <Space>
+                    <Input
+                        placeholder="请输入内容"
+                        allowClear
+                        size="large"
+                        addonBefore="二维码中的内容: "
+                        type="text"
+                        onChange={(e) => {
+                            setQRContent(e.target.value);
+                        }}
+                    />
+                    <Tooltip title="点击后显示一个新的窗口, 用于解析第三方二维码的内容, 将解析出的文本显示.">
+                        <Button
+                            size="large"
+                            onClick={() => setIsParseQROpen(true)}
+                        >
+                            解析二维码
+                        </Button>
+                    </Tooltip>
+                    <Modal
+                        title="解析二维码"
+                        width={800}
+                        open={isParseQROpen}
+                        okText="复制"
+                        onOk={() => {
+                            if (otherQrContentRef.current) {
+                                navigator.clipboard
+                                    .writeText(otherQrContentRef.current)
+                                    .then(() =>
+                                        messageApi.info("已复制到剪切板")
+                                    )
+                                    .catch((err) => messageApi.error(err));
+                            }
+                        }}
+                        cancelText="关闭"
+                        onCancel={() => setIsParseQROpen(false)}
+                        footer={(_, { OkBtn, CancelBtn }) => (
+                            <>
+                                <OkBtn />
+                                <CancelBtn />
+                            </>
+                        )}
+                    >
+                        <QRParse
+                            onChange={(content) =>
+                                (otherQrContentRef.current = content)
+                            }
+                        />
+                    </Modal>
+                </Space>
             </Space>
         </div>
     );
