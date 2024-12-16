@@ -8,6 +8,9 @@ const appVersion = packageJson.version;
 
 // https://vite.dev/config/
 export default defineConfig({
+    server: {
+        port: 3000,
+    },
     plugins: [react(), svgr({ svgrOptions: { icon: true } })],
     define: {
         __APP_VERSION__: `"${appVersion}"`,
