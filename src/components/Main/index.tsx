@@ -1,6 +1,7 @@
-import React from "react";
+import { useState, createElement } from "react";
 // import { BankOutlined } from "@ant-design/icons";
-import { Layout, Menu, MenuProps, theme } from "antd";
+import { Drawer, FloatButton, Layout, Menu, MenuProps, theme } from "antd";
+import { AppstoreOutlined } from "@ant-design/icons";
 import Tool, { ToolName } from "../../Tools/BaseTool";
 
 // 菜单显示顺序依赖于 Tool.getAllTools()
@@ -13,12 +14,13 @@ import QRGenerator from "../Page/QRGenerator";
 // Home中卡片的显示也依赖于上面的导入顺序, 因此需要保证以上顺序
 // Home 的导入必须在 Tool 类之后导入
 import Home from "../Page/Home";
+import YellowPage from "./YellowPage";
 
 const { Content, Footer, Sider } = Layout;
 
 const items = Tool.getAllToolsList().map((tool) => ({
     key: `nav_${tool.name}`,
-    icon: React.createElement(tool.getIcon()),
+    icon: createElement(tool.getIcon()),
     label: tool.label,
 }));
 
@@ -35,7 +37,10 @@ function Main() {
         },
     } = theme.useToken();
 
-    const [currentPage, setCurrentPage] = React.useState<PageName>("nav_Home");
+    const [currentPage, setCurrentPage] = useState<PageName>("nav_Home");
+    const [isOpenYellowPage, setIsOpenYellowPage] = useState(false);
+
+    const handleCloseYellowPage = () => {};
     const GetPage = (key: PageName) => {
         switch (key) {
             case "nav_ExecuteDemonstrator":
@@ -132,6 +137,24 @@ function Main() {
                     TeachingTool ©{new Date().getFullYear()} Created by Iceriny
                 </Footer>
             </Layout>
+            <FloatButton
+                type="primary"
+                icon={<AppstoreOutlined />}
+                tooltip={<div>工具黄页</div>}
+                onClick={() => setIsOpenYellowPage(true)}
+            />
+            <Drawer
+                open={isOpenYellowPage}
+                onClose={() => {
+                    setIsOpenYellowPage(false);
+                    handleCloseYellowPage();
+                }}
+                title="工具黄页"
+                placement="right"
+                width={"30%"}
+            >
+                <YellowPage />
+            </Drawer>
         </Layout>
     );
 }
