@@ -1,6 +1,7 @@
 // import SyntaxHighlighter from "react-syntax-highlighter";
 import { blue } from "@ant-design/colors";
 import { CloseOutlined, DownOutlined } from "@ant-design/icons";
+import type { FormProps, MenuProps } from "antd";
 import {
     Button,
     Card,
@@ -10,14 +11,16 @@ import {
     Form,
     Input,
     InputNumber,
+    Skeleton,
     Space,
     Splitter,
     theme,
     Typography,
 } from "antd";
-import type { FormProps, MenuProps } from "antd";
-import React, { SyntheticEvent, useState } from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
+import React, { SyntheticEvent, useState, Suspense } from "react";
+// 动态加载组件
+const SyntaxHighlighter = React.lazy(() => import("react-syntax-highlighter"));
+
 import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
 
 const { useToken } = theme;
@@ -29,8 +32,10 @@ interface CodeBlockParamType {
     varList: { list: { var: string; varLineNumber: string }[] };
 }
 type CodeBlockParamsType = CodeBlockParamType[];
-
-function Desc(props: { text?: string | number }) {
+interface Props {
+    text?: string | number;
+}
+const Desc: React.FC<Props> = (props: Props) => {
     return (
         <Flex justify="center" align="center" style={{ height: "100%" }}>
             <Typography.Title
@@ -42,7 +47,7 @@ function Desc(props: { text?: string | number }) {
             </Typography.Title>
         </Flex>
     );
-}
+};
 
 const langTypeLabel = {
     cpp: "c++",
@@ -71,7 +76,7 @@ const langTypeItems: MenuProps["items"] = Object.keys(langTypeLabel).map(
     })
 );
 
-function ExecuteDemonstrator() {
+const ExecuteDemonstrator: React.FC = () => {
     // const [form] = Form.useForm();
 
     const demonstrator = TExecuteDemonstrator;
@@ -355,28 +360,30 @@ function ExecuteDemonstrator() {
                             {code == "" || code == undefined ? (
                                 <Desc text="Code Display" />
                             ) : (
-                                <SyntaxHighlighter
-                                    language={langType}
-                                    showLineNumbers={true}
-                                    wrapLines={true} // 必须启用以支持逐行包装
-                                    lineProps={(lineNumber) => ({
-                                        // onClick: () => handleLineClick(lineNumber),
-                                        style: {
-                                            backgroundColor:
-                                                lineNumber == currentLine
-                                                    ? blue[2]
-                                                    : "transparent",
-                                            padding: "3px 10px 3px 3px",
-                                            margin:
-                                                lineNumber == currentLine
-                                                    ? "50px 0 100px 0"
-                                                    : 0,
-                                            borderRadius: "5px",
-                                        },
-                                    })}
-                                >
-                                    {code}
-                                </SyntaxHighlighter>
+                                <Suspense fallback={<Skeleton />}>
+                                    <SyntaxHighlighter
+                                        language={langType}
+                                        showLineNumbers={true}
+                                        wrapLines={true} // 必须启用以支持逐行包装
+                                        lineProps={(lineNumber: number) => ({
+                                            // onClick: () => handleLineClick(lineNumber),
+                                            style: {
+                                                backgroundColor:
+                                                    lineNumber == currentLine
+                                                        ? blue[2]
+                                                        : "transparent",
+                                                padding: "3px 10px 3px 3px",
+                                                margin:
+                                                    lineNumber == currentLine
+                                                        ? "50px 0 100px 0"
+                                                        : 0,
+                                                borderRadius: "5px",
+                                            },
+                                        })}
+                                    >
+                                        {code}
+                                    </SyntaxHighlighter>
+                                </Suspense>
                             )}
                         </div>
                     </Splitter.Panel>
@@ -400,6 +407,6 @@ function ExecuteDemonstrator() {
             </Space>
         </div>
     );
-}
+};
 
 export default ExecuteDemonstrator;

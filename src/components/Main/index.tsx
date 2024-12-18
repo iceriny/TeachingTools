@@ -6,10 +6,15 @@ import Tool, { ToolName } from "../../Tools/BaseTool";
 
 // 菜单显示顺序依赖于 Tool.getAllTools()
 // 导入顺序即为菜单显示顺序
-import DiceTool from "../Page/DiceTool";
-import ExecuteDemonstrator from "../Page/ExecuteDemonstrator";
-import RandomGenerator from "../Page/RandomGenerator";
-import QRGenerator from "../Page/QRGenerator";
+// import DiceTool from "../Page/DiceTool";
+// import ExecuteDemonstrator from "../Page/ExecuteDemonstrator";
+// import RandomGenerator from "../Page/RandomGenerator";
+// import QRGenerator from "../Page/QRGenerator";
+import TDiceTool from "../../Tools/TDiceTool";
+import TExecuteDemonstrator from "../../Tools/TExecuteDemonstrator";
+import TRandomGenerator from "../../Tools/TRandomGenerator";
+import TQRGenerator from "../../Tools/TQRGenerator";
+import TTimeTool from "../../Tools/TTimeTool";
 
 // Home中卡片的显示也依赖于上面的导入顺序, 因此需要保证以上顺序
 // Home 的导入必须在 Tool 类之后导入
@@ -18,15 +23,16 @@ import YellowPage from "./YellowPage";
 
 const { Content, Footer, Sider } = Layout;
 
+export type PageName = `nav_${ToolName}` | "nav_Home";
+
 const items = Tool.getAllToolsList().map((tool) => ({
     key: `nav_${tool.name}`,
     icon: createElement(tool.getIcon()),
     label: tool.label,
 }));
 
-export type PageName = `nav_${ToolName}` | "nav_Home";
 const contentSizeData = { padding: 24, minHeight: 900 };
-function Main() {
+const Main: React.FC = () => {
     const {
         token: {
             colorBgContainer,
@@ -44,18 +50,20 @@ function Main() {
     const GetPage = (key: PageName) => {
         switch (key) {
             case "nav_ExecuteDemonstrator":
-                return <ExecuteDemonstrator />;
+                return <TExecuteDemonstrator.component />;
             case "nav_DiceTool":
-                return <DiceTool />;
+                return <TDiceTool.component />;
             case "nav_RandomGenerator":
-                return <RandomGenerator />;
+                return <TRandomGenerator.component />;
             case "nav_QRGenerator":
                 return (
-                    <QRGenerator
+                    <TQRGenerator.component
                         contentMinHeight={contentSizeData.minHeight}
                         contentPadding={contentSizeData.padding}
                     />
                 );
+            case "nav_TimeTool":
+                return <TTimeTool.component />;
             default:
                 return (
                     <Home
@@ -157,6 +165,6 @@ function Main() {
             </Drawer>
         </Layout>
     );
-}
+};
 
 export default Main;

@@ -1,7 +1,16 @@
-import { useEffect, useState } from "react";
-import Main from "./components/Main";
+import { useEffect, useState, lazy, Suspense } from "react";
+// 动态加载组件
+// import Main from "./components/Main";
+const Main = lazy(() => import("./components/Main"));
+
 import { compareVersions } from "compare-versions";
-import { List, Modal, Space } from "antd";
+import { Space, Spin, List } from "antd";
+
+const Modal = lazy(() =>
+    import("antd").then((module) => ({
+        default: module.Modal, // 指定要加载的命名导出
+    }))
+);
 import VersionJson from "./assets/version.json";
 
 const VERSION_DATA: VersionData = VersionJson as VersionData;
@@ -49,34 +58,57 @@ function App() {
     };
     return (
         <>
-            <Main />
-            <Modal
-                title={`版本更新`}
-                open={isModalOpen}
-                onOk={handleOk}
-                destroyOnClose
-                footer={(_, { OkBtn }) => (
-                    <>
-                        <OkBtn />
-                    </>
-                )}
+            <Suspense
+                fallback={
+                    <div
+                        style={{
+                            height: "100vh",
+                            width: "100vw",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Spin size="large" />
+                    </div>
+                }
             >
-                <Space direction="vertical" size={10} style={{ width: "100%" }}>
-                    {getVersionDesc().map((item, index) => (
-                        <List
-                            key={index}
-                            header={`v${item.version}`}
-                            bordered
-                            size="small"
-                            dataSource={item.desc}
-                            // dataSource={VERSION_DATA[VERSION_DATA.last].desc}
-                            renderItem={(item) => (
-                                <List.Item>· {item}</List.Item>
-                            )}
-                        />
-                    ))}
-                </Space>
-            </Modal>
+                <Main />
+            </Suspense>
+            <Suspense>
+                {" "}
+                <Modal
+                    title={`版本更新`}
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    destroyOnClose
+                    footer={(_, { OkBtn }) => (
+                        <>
+                            <OkBtn />
+                        </>
+                    )}
+                >
+                    <Space
+                        direction="vertical"
+                        size={10}
+                        style={{ width: "100%" }}
+                    >
+                        {getVersionDesc().map((item, index) => (
+                            <List
+                                key={index}
+                                header={`v${item.version}`}
+                                bordered
+                                size="small"
+                                dataSource={item.desc}
+                                // dataSource={VERSION_DATA[VERSION_DATA.last].desc}
+                                renderItem={(item) => (
+                                    <List.Item>· {item}</List.Item>
+                                )}
+                            />
+                        ))}
+                    </Space>
+                </Modal>
+            </Suspense>
         </>
     );
 }

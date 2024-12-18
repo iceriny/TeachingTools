@@ -14,7 +14,7 @@ interface DiceSum {
 }
 type ActionName = "Clear" | "SumClear";
 
-function DiceTool() {
+const DiceTool: React.FC = () => {
     const tool = TDiceTool;
     const [dices, setDices] = useState<Array<number>>([]);
     const [dicesStage, setDicesStage] = useState<Array<boolean>>([]);

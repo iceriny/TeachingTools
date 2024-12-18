@@ -1,4 +1,5 @@
 import Tool from "../BaseTool";
+import ExecuteDemonstrator from "../../components/Page/ExecuteDemonstrator";
 
 type CodeBlocksParamsValue = {
     [key in number]: string;
@@ -19,7 +20,7 @@ interface CodeBlocksData extends CodeBlocksDataExceptCode {
 interface TExecuteDemonstratorProps extends CodeBlocksDataExceptCode {
     code: string;
 }
-class TExecuteDemonstrator extends Tool {
+class TExecuteDemonstrator extends Tool<typeof ExecuteDemonstrator> {
     _code: string;
     _codeLine: CodeBlocksData["code"];
     steps: CodeBlocksData["steps"];
@@ -27,7 +28,12 @@ class TExecuteDemonstrator extends Tool {
     _currentStep = -1;
     _currentLine = 0;
     constructor(data: TExecuteDemonstratorProps) {
-        super("程序执行演示器", "ExecuteDemonstrator", "SwapOutlined");
+        super(
+            ExecuteDemonstrator,
+            "程序执行演示器",
+            "ExecuteDemonstrator",
+            "SwapOutlined"
+        );
         this.description =
             "输入程序代码, 并且录入各种数据, 可以展示程序执行过程.";
         this._code = data.code;
@@ -103,4 +109,4 @@ const instance = TExecuteDemonstrator.getInstance({
     steps: [],
     params: [],
 });
-export default instance as TExecuteDemonstrator;
+export default instance;

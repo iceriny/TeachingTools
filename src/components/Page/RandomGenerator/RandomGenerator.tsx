@@ -123,7 +123,7 @@ const RandomNumberFormatter: (
 ) => JSX.Element = (value, decimals) => {
     return <CountUp end={value as number} separator="," decimals={decimals} />;
 };
-function MyStatistic(props: StatisticProps) {
+const MyStatistic: React.FC<StatisticProps> = (props: StatisticProps) => {
     const formatter: StatisticProps["formatter"] = (value) => {
         return RandomNumberFormatter(value, props.precision);
     };
@@ -136,7 +136,7 @@ function MyStatistic(props: StatisticProps) {
     );
 }
 
-function RandomGenerator() {
+const RandomGenerator:React.FC = () => {
     const [randomData, setRandomData] = useState<RandomInputData>({
         type: "int",
         min: 0,

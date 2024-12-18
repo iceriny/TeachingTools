@@ -90,13 +90,14 @@ const formatter: NonNullable<SliderSingleProps["tooltip"]>["formatter"] = (
             </>
         );
 };
-function QRGenerator({
-    contentMinHeight,
-    contentPadding,
-}: {
+export interface QRGeneratorProps {
     contentMinHeight: number;
     contentPadding: number;
-}) {
+}
+const QRGenerator:React.FC<QRGeneratorProps> = ({
+    contentMinHeight,
+    contentPadding,
+}) => {
     const Tool = TQRGenerator;
     const [messageApi, contextHolder] = message.useMessage();
     const otherQrContentRef = React.useRef<string>();

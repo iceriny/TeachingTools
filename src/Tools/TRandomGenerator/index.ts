@@ -1,8 +1,14 @@
 import Tool from "../BaseTool";
+import RandomGenerator from "../../components/Page/RandomGenerator";
 
-class TRandomGenerator extends Tool {
+class TRandomGenerator extends Tool<typeof RandomGenerator> {
     constructor() {
-        super("随机生成器", "RandomGenerator", "TrademarkOutlined");
+        super(
+            RandomGenerator,
+            "随机生成器",
+            "RandomGenerator",
+            "TrademarkOutlined"
+        );
         this.description = "用于生成随机数的工具.";
     }
 
@@ -61,4 +67,4 @@ class TRandomGenerator extends Tool {
     }
 }
 const instance = TRandomGenerator.getInstance();
-export default instance as TRandomGenerator;
+export default instance;

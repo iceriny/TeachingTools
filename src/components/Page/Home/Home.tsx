@@ -5,15 +5,16 @@ import type { PageName } from "../../Main";
 
 const items = Tool.getAllToolsList();
 const { useToken } = theme;
-function Home({
-    contentMinHeight,
-    contentPadding,
-    cardClickCallback,
-}: {
+interface Props {
     contentMinHeight: number;
     contentPadding: number;
     cardClickCallback: (pageKey: PageName) => void;
-}) {
+};
+const Home: React.FC<Props> = ({
+    contentMinHeight,
+    contentPadding,
+    cardClickCallback,
+}: Props) => {
     const { token } = useToken();
     const handleCardClick = (event: React.MouseEvent) => {
         cardClickCallback(

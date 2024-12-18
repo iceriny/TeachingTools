@@ -6,7 +6,7 @@ import jsQR from "jsqr";
 interface Props {
     onChange?: (content: string) => void;
 }
-function QRParse({ onChange }: Props) {
+const QRParse: React.FC<Props> = ({ onChange }: Props) => {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [qrContent, setQRContent] = useState<string>();
