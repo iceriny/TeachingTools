@@ -14,7 +14,7 @@ import TDiceTool from "../../Tools/TDiceTool";
 import TExecuteDemonstrator from "../../Tools/TExecuteDemonstrator";
 import TRandomGenerator from "../../Tools/TRandomGenerator";
 import TQRGenerator from "../../Tools/TQRGenerator";
-import TTimeTool from "../../Tools/TTimeTool";
+// import TTimeTool from "../../Tools/TTimeTool";
 
 // Home中卡片的显示也依赖于上面的导入顺序, 因此需要保证以上顺序
 // Home 的导入必须在 Tool 类之后导入
@@ -62,8 +62,8 @@ const Main: React.FC = () => {
                         contentPadding={contentSizeData.padding}
                     />
                 );
-            case "nav_TimeTool":
-                return <TTimeTool.component />;
+            // case "nav_TimeTool":
+            //     return <TTimeTool.component />;
             default:
                 return (
                     <Home
