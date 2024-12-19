@@ -28,54 +28,57 @@ class TTimeTool extends Tool<typeof TimeTool> {
     private sigleUpdateTime(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined) return;
+        console.log(timing.t);
         const now = performance.now();
         timing.t += now - timing.prevT;
-        timing.callback(timing.t);
+        timing.callback?.(timing.t);
         timing.prevT = now;
         return timing;
     }
     private updateTime(key: symbol) {
         const timing = this.sigleUpdateTime(key);
         if (timing === undefined) return;
-        console.log(timing.t);
         timing.interval = setTimeout(() => {
             this.updateTime(key);
-        }, 10);
+        }, 100);
     }
     startTiming(callback: (t: number) => void, key?: symbol) {
         if (key === undefined) {
             key = Symbol();
-        } else if (
-            this.timingTimes.has(key) &&
-            this.timingTimes.get(key)!.interval
-        ) {
-            const timing = this.timingTimes.get(key)!;
-            clearInterval(timing.interval!);
         }
+
+        let timing: Timing | undefined = this.timingTimes.get(key);
+
+        if (timing && timing.interval) {
+            clearInterval(timing.interval);
+        }
+
         const now = performance.now();
-        const timing: Timing = { t: 0, prevT: now, interval: null, callback };
-        timing.interval = setTimeout(() => {
-            this.updateTime(key);
-        }, 20);
+
+        timing = { t: 0, prevT: now, interval: null, callback };
         this.timingTimes.set(key, timing);
+        this.updateTime(key);
         return key;
     }
     pauseTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined || timing.interval === null) return;
-
+        console.log(this.timingTimes.size);
         clearInterval(timing.interval);
         timing.interval = null;
         this.sigleUpdateTime(key);
     }
     resumeTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
-        if (timing === undefined || timing.interval !== null) return;
-
+        if (timing === undefined) return;
+        if (timing.interval) {
+            const _callback = timing.callback;
+            this.stopTiming(key);
+            this.startTiming(_callback, key);
+            return;
+        }
         timing.prevT = performance.now();
-        timing.interval = setTimeout(() => {
-            this.updateTime(key);
-        }, 20);
+        this.updateTime(key);
     }
     stopTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
