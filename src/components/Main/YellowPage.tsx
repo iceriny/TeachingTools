@@ -115,6 +115,24 @@ const Items: ItemProps[] = [
         description: "AI作曲网站, 快速生成音乐, 快速生成歌词. 效果不错",
         tags: ["工具", "AI", "大规模语言模型", "AI音乐"],
     },
+    {
+        label: "码云(gitee)",
+        link: "https://gitee.com/",
+        description:
+            "国内类似Github的网站, 支持代码片段分享, 可以创建代码片段给学生分享.",
+        tags: ["工具", "远程Git", "云库", "Github Gist"],
+    },
+    {
+        label: "码云代码片段直达(gitee)",
+        link: "https://gitee.com/dashboard/codes",
+        description: "用于分享代码片段的码云直达链接. 需要账号.",
+        tags: [
+            "工具",
+            "代码片段",
+            "Github Gist",
+            { color: "warning", text: "需要账号" },
+        ],
+    },
 ];
 
 function YellowPage() {
