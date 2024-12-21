@@ -25,7 +25,7 @@ class TTimeTool extends Tool<typeof TimeTool> {
         return dayjs();
     }
 
-    private sigleUpdateTime(key: symbol) {
+    private singleUpdateTime(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined) return;
         console.log(timing.t);
@@ -36,7 +36,7 @@ class TTimeTool extends Tool<typeof TimeTool> {
         return timing;
     }
     private updateTime(key: symbol) {
-        const timing = this.sigleUpdateTime(key);
+        const timing = this.singleUpdateTime(key);
         if (timing === undefined) return;
         timing.interval = setTimeout(() => {
             this.updateTime(key);
@@ -66,17 +66,18 @@ class TTimeTool extends Tool<typeof TimeTool> {
         console.log(this.timingTimes.size);
         clearInterval(timing.interval);
         timing.interval = null;
-        this.sigleUpdateTime(key);
+        this.singleUpdateTime(key);
+        return timing.t;
     }
     resumeTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
-        if (timing === undefined) return;
-        if (timing.interval) {
-            const _callback = timing.callback;
-            this.stopTiming(key);
-            this.startTiming(_callback, key);
-            return;
-        }
+        if (timing === undefined || timing.interval) return;
+        // if (timing.interval) {
+        //     const _callback = timing.callback;
+        //     this.stopTiming(key);
+        //     this.startTiming(_callback, key);
+        //     return;
+        // }
         timing.prevT = performance.now();
         this.updateTime(key);
     }
@@ -86,7 +87,7 @@ class TTimeTool extends Tool<typeof TimeTool> {
 
         if (timing.interval) {
             clearInterval(timing.interval);
-            this.sigleUpdateTime(key);
+            this.singleUpdateTime(key);
         }
 
         const result = timing.t;
