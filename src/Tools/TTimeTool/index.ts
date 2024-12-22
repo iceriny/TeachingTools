@@ -24,6 +24,13 @@ class TTimeTool extends Tool<typeof TimeTool> {
     get time() {
         return dayjs();
     }
+    get today() {
+        return dayjs()
+            .set("hour", 0)
+            .set("minute", 0)
+            .set("second", 0)
+            .set("millisecond", 0);
+    }
 
     private singleUpdateTime(key: symbol) {
         const timing = this.timingTimes.get(key);

@@ -1,6 +1,7 @@
 import { Button, Flex, List, Typography, theme } from "antd";
 import {
     CaretRightOutlined,
+    DeleteOutlined,
     FieldTimeOutlined,
     PauseOutlined,
     RedoOutlined,
@@ -180,7 +181,7 @@ const Timing: FC<TimingProps> = ({ size = 1 }) => {
     const mainSize = size * 1.5;
 
     return (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "400px" }}>
             <Flex vertical align="center" gap={10}>
                 <Typography.Title level={4}>
                     <FieldTimeOutlined style={{ marginRight: "0.5rem" }} />
@@ -196,49 +197,60 @@ const Timing: FC<TimingProps> = ({ size = 1 }) => {
                         token.colorTextDescription,
                     ]}
                 />
-                <ButtonGroup>
-                    {state[0] ? (
-                        <Button onClick={handleStop} icon={<XFilled />}>
-                            停止
-                        </Button>
-                    ) : (
-                        <Button
-                            onClick={handleStart}
-                            icon={<CaretRightOutlined />}
-                        >
-                            开始
-                        </Button>
-                    )}
-                    {state[1] ? (
-                        <Button
-                            onClick={handleResume}
-                            disabled={!state[0]}
-                            icon={<RedoOutlined />}
-                        >
-                            继续
-                        </Button>
-                    ) : (
-                        <Button
-                            onClick={handlePause}
-                            disabled={!state[0]}
-                            icon={<PauseOutlined />}
-                        >
-                            暂停
-                        </Button>
-                    )}
+                <Flex gap={10}>
+                    <ButtonGroup>
+                        {state[0] ? (
+                            <Button
+                                danger
+                                onClick={handleStop}
+                                icon={<XFilled />}
+                            >
+                                停止
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={handleStart}
+                                icon={<CaretRightOutlined />}
+                                type="primary"
+                            >
+                                开始
+                            </Button>
+                        )}
+                        {state[1] ? (
+                            <Button
+                                onClick={handleResume}
+                                disabled={!state[0]}
+                                icon={<RedoOutlined />}
+                            >
+                                继续
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={handlePause}
+                                disabled={!state[0]}
+                                icon={<PauseOutlined />}
+                            >
+                                暂停
+                            </Button>
+                        )}
 
+                        <Button
+                            onClick={() => {
+                                for (const p of points) {
+                                    if (equal(p, timePoint)) return;
+                                }
+                                setPoints([...points, timePoint]);
+                            }}
+                            icon={<UnorderedListOutlined />}
+                        >
+                            记录
+                        </Button>
+                    </ButtonGroup>
                     <Button
-                        onClick={() => {
-                            for (const p of points) {
-                                if (equal(p, timePoint)) return;
-                            }
-                            setPoints([...points, timePoint]);
-                        }}
-                        icon={<UnorderedListOutlined />}
-                    >
-                        记录
-                    </Button>
-                </ButtonGroup>
+                        onClick={() => setPoints([])}
+                        icon={<DeleteOutlined />}
+                    />
+                </Flex>
                 {points.length > 0 && (
                     <List
                         style={{ width: "100%" }}
