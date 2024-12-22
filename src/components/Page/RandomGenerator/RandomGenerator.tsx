@@ -134,9 +134,9 @@ const MyStatistic: React.FC<StatisticProps> = (props: StatisticProps) => {
             formatter={props.formatter || formatter}
         />
     );
-}
+};
 
-const RandomGenerator:React.FC = () => {
+const RandomGenerator: React.FC = () => {
     const [randomData, setRandomData] = useState<RandomInputData>({
         type: "int",
         min: 0,
@@ -208,7 +208,7 @@ const RandomGenerator:React.FC = () => {
         <Space direction="vertical" style={{ width: "100%" }}>
             {contextHolder}
             <Typography.Title level={5}>通用随机生成器</Typography.Title>
-            <Space size={40}>
+            <Space size={40} wrap>
                 <InputNumber
                     changeOnWheel
                     addonBefore="最小值: "
@@ -323,6 +323,6 @@ const RandomGenerator:React.FC = () => {
             </Space>
         </Space>
     );
-}
+};
 
 export default RandomGenerator;

@@ -160,11 +160,11 @@ const Timing: FC<TimingProps> = ({ size = 1 }) => {
         setState([true, false]);
     };
     const handleStop = () => {
-        const t = TTimeTool.stopTiming(interval.current!);
+        TTimeTool.stopTiming(interval.current!);
         setState([false, false]);
     };
     const handlePause = () => {
-        const t = TTimeTool.pauseTiming(interval.current!);
+        TTimeTool.pauseTiming(interval.current!);
         setState([true, true]);
     };
     const handleResume = () => {

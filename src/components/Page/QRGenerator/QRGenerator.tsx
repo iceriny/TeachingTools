@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import TQRGenerator from "../../../Tools/TQRGenerator";
 
@@ -94,25 +94,46 @@ export interface QRGeneratorProps {
     contentMinHeight: number;
     contentPadding: number;
 }
-const QRGenerator:React.FC<QRGeneratorProps> = ({
+type QRIcon = { src: string; name: string };
+interface QRInfo {
+    content?: string;
+    type: "svg" | "canvas";
+    color?: string;
+    size: number;
+    icon?: QRIcon;
+    iconSize?: number;
+    level: "L" | "M" | "Q" | "H";
+}
+const QRGenerator: React.FC<QRGeneratorProps> = ({
     contentMinHeight,
     contentPadding,
 }) => {
     const Tool = TQRGenerator;
     const [messageApi, contextHolder] = message.useMessage();
     const otherQrContentRef = React.useRef<string>();
-    const [qrContent, setQRContent] = useState<string>();
-    const [qrType, setQRType] = useState<"svg" | "canvas">("svg");
-    const [qrColor, setQRColor] = useState<string>();
-    const [qrIcon, setQRIcon] = useState<{ src: string; name: string }>();
-    const [qrIconSize, setQRIconSize] = useState<number>();
-    const [level, setLevel] = useState<"L" | "M" | "Q" | "H">("M");
+    const [qrInfo, setQRInfo] = useState<QRInfo>({
+        type: "svg",
+        level: "M",
+        size: window.innerWidth / 5,
+    });
     const [isParseQROpen, setIsParseQROpen] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setQRInfo({ ...qrInfo, size: window.innerWidth / 5 }); // 更新状态
+        };
+
+        window.addEventListener("resize", handleResize); // 添加监听器
+
+        return () => {
+            window.removeEventListener("resize", handleResize); // 清理监听器
+        };
+    }, []); // 空依赖数组，确保只运行一次
     const onTypeChange = ({ target: { value } }: RadioChangeEvent) => {
-        setQRType(value);
+        setQRInfo({ ...qrInfo, type: value });
     };
     const onClickDownload = () => {
-        if (qrType === "svg") {
+        if (qrInfo.type === "svg") {
             downloadSvgQRCode();
         } else {
             downloadCanvasQRCode();
@@ -120,9 +141,12 @@ const QRGenerator:React.FC<QRGeneratorProps> = ({
     };
 
     const handleUploadIcon = (fileName: string, result: string) => {
-        setQRIcon({
-            src: result,
-            name: fileName || "未选择",
+        setQRInfo({
+            ...qrInfo,
+            icon: {
+                src: result,
+                name: fileName || "未选择",
+            },
         }); // 将图片的Base64 URL存储到状态
     };
     return (
@@ -140,13 +164,13 @@ const QRGenerator:React.FC<QRGeneratorProps> = ({
                 <Typography.Title level={3}>{Tool.label}</Typography.Title>
                 <div id="qr-code-display">
                     <QRCode
-                        size={300}
-                        value={qrContent || "请输入内容"}
-                        type={qrType}
-                        color={qrColor}
-                        iconSize={qrIconSize}
-                        icon={qrIcon?.src}
-                        errorLevel={level}
+                        size={qrInfo.size}
+                        value={qrInfo.content || "请输入内容"}
+                        type={qrInfo.type}
+                        color={qrInfo.color}
+                        iconSize={qrInfo.iconSize}
+                        icon={qrInfo.icon?.src}
+                        errorLevel={qrInfo.level}
                     />
                 </div>
                 <Space>
@@ -157,12 +181,12 @@ const QRGenerator:React.FC<QRGeneratorProps> = ({
                         ]}
                         optionType="button"
                         onChange={onTypeChange}
-                        value={qrType}
+                        value={qrInfo.type}
                     />
                     <ColorPicker
                         defaultValue="#1677ff"
                         onChange={(e) => {
-                            setQRColor(e?.toHexString());
+                            setQRInfo({ ...qrInfo, color: e?.toHexString() });
                         }}
                     />
                     <Button onClick={onClickDownload}>下载</Button>
@@ -186,23 +210,22 @@ const QRGenerator:React.FC<QRGeneratorProps> = ({
                                     : e === 66
                                     ? "Q"
                                     : "H";
-                            console.log(level);
-                            setLevel(level);
+                            setQRInfo({ ...qrInfo, level });
                         }}
                     />
                 </Space>
                 <Space>
                     <InputFile
-                        title={qrIcon?.name || "自定义图标"}
+                        title={qrInfo.icon?.name || "自定义图标"}
                         onChange={handleUploadIcon}
                     />
-                    {qrIcon?.name && (
+                    {qrInfo.icon?.name && (
                         <InputNumber
                             style={{ width: "140px" }}
                             addonBefore="图标大小"
                             defaultValue={32}
                             onChange={(e) => {
-                                setQRIconSize(e || 32);
+                                setQRInfo({ ...qrInfo, iconSize: e || 32 });
                             }}
                         />
                     )}
@@ -215,7 +238,7 @@ const QRGenerator:React.FC<QRGeneratorProps> = ({
                         addonBefore="二维码中的内容: "
                         type="text"
                         onChange={(e) => {
-                            setQRContent(e.target.value);
+                            setQRInfo({ ...qrInfo, content: e.target.value });
                         }}
                     />
                     <Tooltip title="点击后显示一个新的窗口, 用于解析第三方二维码的内容, 将解析出的文本显示.">
@@ -260,6 +283,6 @@ const QRGenerator:React.FC<QRGeneratorProps> = ({
             </Space>
         </div>
     );
-}
+};
 
 export default QRGenerator;
