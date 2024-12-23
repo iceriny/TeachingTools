@@ -1,19 +1,27 @@
-import { Divider, Flex } from "antd";
+import { Col, Divider, Row } from "antd";
 // import TTimeTool from "../../../Tools/TTimeTool";
 
 import Clock from "./Clock";
-import Timing from "./Timing";
 import TimeCountdown from "./Countdown";
+import Timing from "./Timing";
+import TimeCalculators from "./TimeCalculators";
 
 function TimeTool() {
     return (
         <div>
             <Clock />
             <Divider />
-            <Flex gap={10} wrap>
-                <Timing />
-                <TimeCountdown />
-            </Flex>
+            <Row gutter={[16, 32]}>
+                <Col span={12}>
+                    <Timing />
+                </Col>
+                <Col span={12}>
+                    <TimeCountdown />
+                </Col>
+                <Col span={24}>
+                    <TimeCalculators />
+                </Col>
+            </Row>
         </div>
     );
 }

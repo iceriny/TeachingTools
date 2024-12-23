@@ -77,10 +77,8 @@ function App() {
                 <ConfigProvider locale={locale}>
                     <Main />
                 </ConfigProvider>
-                ;
             </Suspense>
             <Suspense>
-                {" "}
                 <Modal
                     title={`版本更新`}
                     open={isModalOpen}

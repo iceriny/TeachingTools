@@ -181,101 +181,95 @@ const Timing: FC<TimingProps> = ({ size = 1 }) => {
     const mainSize = size * 1.5;
 
     return (
-        <div style={{ width: "400px" }}>
-            <Flex vertical align="center" gap={10}>
-                <Typography.Title level={4}>
-                    <FieldTimeOutlined style={{ marginRight: "0.5rem" }} />
-                    计时器
-                </Typography.Title>
-                <TimeDisplay
-                    {...timePoint}
-                    size={mainSize}
-                    color={[
-                        token.colorText,
-                        token.colorText,
-                        token.colorText,
-                        token.colorTextDescription,
-                    ]}
-                />
-                <Flex gap={10}>
-                    <ButtonGroup>
-                        {state[0] ? (
-                            <Button
-                                danger
-                                onClick={handleStop}
-                                icon={<XFilled />}
-                            >
-                                停止
-                            </Button>
-                        ) : (
-                            <Button
-                                onClick={handleStart}
-                                icon={<CaretRightOutlined />}
-                                type="primary"
-                            >
-                                开始
-                            </Button>
-                        )}
-                        {state[1] ? (
-                            <Button
-                                onClick={handleResume}
-                                disabled={!state[0]}
-                                icon={<RedoOutlined />}
-                            >
-                                继续
-                            </Button>
-                        ) : (
-                            <Button
-                                onClick={handlePause}
-                                disabled={!state[0]}
-                                icon={<PauseOutlined />}
-                            >
-                                暂停
-                            </Button>
-                        )}
-
-                        <Button
-                            onClick={() => {
-                                for (const p of points) {
-                                    if (equal(p, timePoint)) return;
-                                }
-                                setPoints([...points, timePoint]);
-                            }}
-                            icon={<UnorderedListOutlined />}
-                        >
-                            记录
+        <Flex vertical align="center" justify="center" gap={10}>
+            <Typography.Title level={4}>
+                <FieldTimeOutlined style={{ marginRight: "0.5rem" }} />
+                计时器
+            </Typography.Title>
+            <TimeDisplay
+                {...timePoint}
+                size={mainSize}
+                color={[
+                    token.colorText,
+                    token.colorText,
+                    token.colorText,
+                    token.colorTextDescription,
+                ]}
+            />
+            <Flex gap={10}>
+                <ButtonGroup>
+                    {state[0] ? (
+                        <Button danger onClick={handleStop} icon={<XFilled />}>
+                            停止
                         </Button>
-                    </ButtonGroup>
+                    ) : (
+                        <Button
+                            onClick={handleStart}
+                            icon={<CaretRightOutlined />}
+                            type="primary"
+                        >
+                            开始
+                        </Button>
+                    )}
+                    {state[1] ? (
+                        <Button
+                            onClick={handleResume}
+                            disabled={!state[0]}
+                            icon={<RedoOutlined />}
+                        >
+                            继续
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={handlePause}
+                            disabled={!state[0]}
+                            icon={<PauseOutlined />}
+                        >
+                            暂停
+                        </Button>
+                    )}
+
                     <Button
-                        onClick={() => setPoints([])}
-                        icon={<DeleteOutlined />}
-                    />
-                </Flex>
-                {points.length > 0 && (
-                    <List
-                        style={{ width: "100%" }}
-                        bordered
-                        size="small"
-                        dataSource={points}
-                        renderItem={(item, index) => (
-                            <List.Item key={item.h + item.m + item.s}>
-                                <TimeDisplay
-                                    {...item}
-                                    size={size}
-                                    color={token.colorTextDescription}
-                                />
-                                {index !== 0 && (
-                                    <Diff
-                                        diff={item.t - points[index - 1].t}
-                                        size={size}
-                                    />
-                                )}
-                            </List.Item>
-                        )}
-                    />
-                )}
+                        onClick={() => {
+                            for (const p of points) {
+                                if (equal(p, timePoint)) return;
+                            }
+                            setPoints([...points, timePoint]);
+                        }}
+                        icon={<UnorderedListOutlined />}
+                    >
+                        记录
+                    </Button>
+                </ButtonGroup>
+                <Button
+                    onClick={() => setPoints([])}
+                    icon={<DeleteOutlined />}
+                />
             </Flex>
-        </div>
+            {points.length > 0 && (
+                <List
+                    style={{ width: "100%" }}
+                    bordered
+                    size="small"
+                    dataSource={points}
+                    renderItem={(item, index) => (
+                        <List.Item key={item.h + item.m + item.s}>
+                            <TimeDisplay
+                                {...item}
+                                size={size}
+                                color={token.colorTextDescription}
+                            />
+                            {index !== 0 && (
+                                <Diff
+                                    diff={item.t - points[index - 1].t}
+                                    size={size}
+                                />
+                            )}
+                        </List.Item>
+                    )}
+                />
+            )}
+        </Flex>
     );
 };
 
