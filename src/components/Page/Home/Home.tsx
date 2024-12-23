@@ -9,7 +9,7 @@ interface Props {
     contentMinHeight: number;
     contentPadding: number;
     cardClickCallback: (pageKey: PageName) => void;
-};
+}
 const Home: React.FC<Props> = ({
     contentMinHeight,
     contentPadding,
@@ -30,7 +30,7 @@ const Home: React.FC<Props> = ({
                 justifyContent: "center",
             }}
         >
-            <Space>
+            <Space wrap>
                 {items.map((item, index) => {
                     return (
                         <Card
@@ -68,6 +68,6 @@ const Home: React.FC<Props> = ({
             </Space>
         </div>
     );
-}
+};
 
 export default Home;

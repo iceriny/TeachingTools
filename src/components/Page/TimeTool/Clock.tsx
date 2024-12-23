@@ -1,17 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import TTimeTool from "../../../Tools/TTimeTool";
-import { Typography, theme } from "antd";
+import TimeDisplay, { type TimeDisplayProps } from "./TimeDisplay";
 
-const { useToken } = theme;
-
-interface TimeObj {
-    y: number;
-    m: number;
-    d: number;
-    h: number;
-    i: number;
-    s: number;
-}
+interface TimeObj extends TimeDisplayProps {}
 const getTime: () => TimeObj = () => {
     const time = TTimeTool.time;
     return {
@@ -23,10 +14,9 @@ const getTime: () => TimeObj = () => {
         s: time.second(),
     };
 };
-const Clock: React.FC = () => {
+const Clock: FC = () => {
     const [currentTime, setCurrentTime] = useState(getTime());
-    const { token } = useToken();
-    
+
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTime(getTime());
@@ -35,47 +25,7 @@ const Clock: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    return (
-        <div
-            style={{
-                fontSize: "2rem",
-                textAlign: "center",
-            }}
-        >
-            <Typography.Title level={2} style={{ width: "100%" }}>
-                {currentTime.y}
-                <span
-                    style={{
-                        fontSize: "1rem",
-                        color: token.colorTextDescription,
-                    }}
-                >
-                    年
-                </span>{" "}
-                {currentTime.m}
-                <span
-                    style={{
-                        fontSize: "1rem",
-                        color: token.colorTextDescription,
-                    }}
-                >
-                    月
-                </span>{" "}
-                {currentTime.d}
-                <span
-                    style={{
-                        fontSize: "1rem",
-                        color: token.colorTextDescription,
-                    }}
-                >
-                    日
-                </span>{" "}
-                {`${currentTime.h}`.padStart(2, "0")}:
-                {`${currentTime.i}`.padStart(2, "0")}:
-                {`${currentTime.s}`.padStart(2, "0")}
-            </Typography.Title>
-        </div>
-    );
+    return <TimeDisplay {...currentTime} size={5} />;
 };
 
 export default Clock;

@@ -35,7 +35,8 @@ const DiceTool: React.FC = () => {
         newDicesStage[index] = !newDicesStage[index];
         setDicesStage(newDicesStage);
     };
-    const HandleCancelSelect = () => {
+    const HandleCancelSelect = (event: React.MouseEvent) => {
+        console.log(event);
         setDicesStage(dicesStage.map(() => false));
     };
     const HandleSumClick = (event: React.MouseEvent) => {
@@ -89,20 +90,29 @@ const DiceTool: React.FC = () => {
         }
     };
     return (
-        <Flex onDoubleClick={HandleCancelSelect}>
+        <Flex vertical gap={10} onDoubleClick={HandleCancelSelect}>
             {contextHolder}
             <Flex
-                style={{ width: "60%", marginRight: "20px" }}
+                style={{ width: "100%", marginRight: "20px" }}
                 vertical
                 gap="10px"
                 justify="center"
                 align="center"
             >
-                <Space style={{ minHeight: 200 }} wrap>
+                <Flex
+                    style={{
+                        width: "60%",
+                        minHeight: 200,
+                    }}
+                    wrap
+                    align="center"
+                    justify="center"
+                >
                     {dices.length != 0
                         ? dices.map((dice, index) => {
                               return (
                                   <Dice
+                                      size={100}
                                       key={index}
                                       index={index}
                                       acitive={dicesStage[index]}
@@ -112,8 +122,8 @@ const DiceTool: React.FC = () => {
                               );
                           })
                         : "请点击 Roll 按钮, 投掷一个骰子."}
-                </Space>
-                <Space>
+                </Flex>
+                <Space wrap>
                     <Dropdown.Button
                         size="large"
                         style={{ width: 100 }}
@@ -182,7 +192,7 @@ const DiceTool: React.FC = () => {
                     </Popconfirm>
                 </Space>
             </Flex>
-            <Flex gap="10px" wrap style={{ width: "40%" }}>
+            <Flex gap="10px" wrap>
                 {sums.map((sum, index) => {
                     return (
                         <Card
@@ -197,6 +207,6 @@ const DiceTool: React.FC = () => {
             </Flex>
         </Flex>
     );
-}
+};
 
 export default DiceTool;

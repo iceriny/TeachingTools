@@ -1,7 +1,8 @@
-import { useState, createElement } from "react";
+import { useState, createElement, useRef, useEffect } from "react";
 // import { BankOutlined } from "@ant-design/icons";
-import { Drawer, FloatButton, Layout, Menu, MenuProps, theme } from "antd";
-import { AppstoreOutlined } from "@ant-design/icons";
+import { Drawer, FloatButton, Input, Layout, Menu, theme } from "antd";
+import type { InputRef, MenuProps } from "antd";
+import { AppstoreOutlined, SearchOutlined } from "@ant-design/icons";
 import Tool, { ToolName } from "../../Tools/BaseTool";
 
 // 菜单显示顺序依赖于 Tool.getAllTools()
@@ -31,20 +32,33 @@ const items = Tool.getAllToolsList().map((tool) => ({
     label: tool.label,
 }));
 
-const contentSizeData = { padding: 24, minHeight: 900 };
+const contentSizeData = {
+    padding: 24,
+    minHeight: 900,
+};
 const Main: React.FC = () => {
     const {
         token: {
             colorBgContainer,
             borderRadiusLG,
-            // colorPrimary,
-            // colorText,
-            // colorBgTextHover,
+            colorPrimary,
+            colorText,
+            colorBgTextHover,
         },
     } = theme.useToken();
 
     const [currentPage, setCurrentPage] = useState<PageName>("nav_Home");
     const [isOpenYellowPage, setIsOpenYellowPage] = useState(false);
+
+    const [searchPrepare, setSearchPrepare] = useState(false);
+    const [searchKey, setSearchKey] = useState<string[]>([]);
+    const searchRef = useRef<InputRef>(null);
+
+    useEffect(() => {
+        if (searchRef.current) {
+            searchRef.current.focus({ cursor: "all" });
+        }
+    }, [searchPrepare]);
 
     const handleCloseYellowPage = () => {};
     const GetPage = (key: PageName) => {
@@ -84,7 +98,6 @@ const Main: React.FC = () => {
             <Sider
                 theme="light"
                 breakpoint="lg"
-                collapsedWidth="0"
                 onBreakpoint={(broken) => {
                     console.log(broken);
                 }}
@@ -93,10 +106,9 @@ const Main: React.FC = () => {
                 }}
                 style={{ padding: "5px" }}
             >
-                {/* <div
+                <div
                     style={{
                         width: "100%",
-                        height: "60px",
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,
                         marginBottom: "10px",
@@ -108,7 +120,10 @@ const Main: React.FC = () => {
                             "color .5s ease-in-out, background .5s ease-in-out",
                     }}
                     onClick={() => {
-                        setCurrentPage("nav_Home");
+                        setSearchPrepare(true);
+                        // setTimeout(() => {
+                        //     searchRef.current?.focus();
+                        // }, 50);
                     }}
                     onMouseEnter={(event) => {
                         event.currentTarget.style.color = colorPrimary;
@@ -119,13 +134,52 @@ const Main: React.FC = () => {
                         event.currentTarget.style.background = colorBgContainer;
                     }}
                 >
-                    <BankOutlined style={{ fontSize: "1.5rem" }} />
-                </div> */}
+                    <Input
+                        ref={searchRef}
+                        placeholder="搜索"
+                        style={{
+                            width: "100%",
+                            display: searchPrepare ? "block" : "none",
+                        }}
+                        onBlur={(event) => {
+                            setSearchKey(event.target.value.split(/\s+/g));
+                            setSearchPrepare(false);
+                        }}
+                        onChange={(event) => {
+                            setSearchKey(
+                                (event.target as HTMLInputElement).value.split(
+                                    /\s+/g
+                                )
+                            );
+                        }}
+                        onPressEnter={(event) => {
+                            setSearchKey(
+                                (event.target as HTMLInputElement).value.split(
+                                    /\s+/g
+                                )
+                            );
+                            setSearchPrepare(false);
+                        }}
+                    />
+                    <SearchOutlined
+                        style={{
+                            display: searchPrepare ? "none" : "block",
+                            fontSize: "1rem",
+                            padding: ".5rem",
+                        }}
+                    />
+                </div>
                 <Menu
                     theme="light"
                     mode="inline"
                     defaultSelectedKeys={[currentPage]}
-                    items={items}
+                    items={items.filter((item) => {
+                        return searchKey.every((key) => {
+                            return item.label
+                                .toLowerCase()
+                                .includes(key.toLowerCase());
+                        });
+                    })}
                     onClick={HandleMenuClick}
                 />
             </Sider>

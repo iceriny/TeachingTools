@@ -4,7 +4,8 @@ import { useEffect, useState, lazy, Suspense } from "react";
 const Main = lazy(() => import("./components/Main"));
 
 import { compareVersions } from "compare-versions";
-import { Space, Spin, List } from "antd";
+import { Space, Spin, List, ConfigProvider } from "antd";
+import locale from "antd/locale/zh_CN";
 
 const Modal = lazy(() =>
     import("antd").then((module) => ({
@@ -73,10 +74,11 @@ function App() {
                     </div>
                 }
             >
-                <Main />
+                <ConfigProvider locale={locale}>
+                    <Main />
+                </ConfigProvider>
             </Suspense>
             <Suspense>
-                {" "}
                 <Modal
                     title={`版本更新`}
                     open={isModalOpen}
