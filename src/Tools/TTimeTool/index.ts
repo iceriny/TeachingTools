@@ -1,13 +1,13 @@
-import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 // import * as isLeapYear from "dayjs/plugin/isLeapYear"; // 导入插件
 import "dayjs/locale/zh-cn"; // 导入本地化语言
 
 import TimeTool from "../../components/Page/TimeTool";
 import Tool from "../BaseTool";
 
-import duration from "dayjs/plugin/duration";
 import type { Duration } from "dayjs/plugin/duration";
+import duration from "dayjs/plugin/duration";
 dayjs.extend(duration); // 使用插件
 dayjs.locale("zh-cn"); // 使用本地化语言
 
@@ -224,10 +224,10 @@ class TTimeTool extends Tool<typeof TimeTool> {
 function isPointTime(value: number | Dayjs): value is Dayjs {
     return typeof value !== "number";
 }
-function isDayjs(value: Dayjs | Duration): value is Dayjs {
-    return !dayjs.isDuration(value);
-}
+// function isDayjs(value: Dayjs | Duration): value is Dayjs {
+//     return !dayjs.isDuration(value);
+// }
 const instance = TTimeTool.getInstance();
 export default instance;
-export { RangeLabel, isPointTime };
+export { isPointTime, RangeLabel };
 export type { CalSymbol, CalType, RangeLabelType, RangeType };
