@@ -14,7 +14,11 @@ const getTime: () => TimeObj = () => {
         s: time.second(),
     };
 };
-const Clock: FC = () => {
+interface ClockProps {
+    size?: TimeDisplayProps["size"];
+    show?: TimeDisplayProps["show"];
+}
+const Clock: FC<ClockProps> = (props: ClockProps) => {
     const [currentTime, setCurrentTime] = useState(getTime());
 
     useEffect(() => {
@@ -25,7 +29,7 @@ const Clock: FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    return <TimeDisplay {...currentTime} size={5} />;
+    return <TimeDisplay {...currentTime} {...props} />;
 };
 
 export default Clock;

@@ -1,6 +1,6 @@
 import { useState, createElement, useRef, useEffect } from "react";
 // import { BankOutlined } from "@ant-design/icons";
-import { Drawer, FloatButton, Input, Layout, Menu, theme } from "antd";
+import { Divider, Drawer, FloatButton, Input, Layout, Menu, theme } from "antd";
 import type { InputRef, MenuProps } from "antd";
 import { AppstoreOutlined, SearchOutlined } from "@ant-design/icons";
 import Tool, { ToolName } from "../../Tools/BaseTool";
@@ -21,6 +21,7 @@ import TTimeTool from "../../Tools/TTimeTool";
 // Home 的导入必须在 Tool 类之后导入
 import Home from "../Page/Home";
 import YellowPage from "./YellowPage";
+import Clock from "../Page/TimeTool/Clock";
 
 const { Content, Footer, Sider } = Layout;
 
@@ -106,6 +107,20 @@ const Main: React.FC = () => {
                 }}
                 style={{ padding: "5px" }}
             >
+                {currentPage !== "nav_TimeTool" && (
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignContent: "center",
+                            justifyContent: "center",
+                            width: "100%",
+                        }}
+                    >
+                        <Clock size={1} show={["h", "i", "s"]} />
+                        <Divider style={{ margin: "8px 0 8px 0" }} />
+                    </div>
+                )}
                 <div
                     style={{
                         width: "100%",

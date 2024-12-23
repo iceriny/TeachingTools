@@ -242,6 +242,7 @@ const TimeCalculators: FC = () => {
                     h={result.get("h")}
                     i={result.get("minute")}
                     s={result.get("s")}
+                    size={2}
                 />
             </Flex>
         </Flex>

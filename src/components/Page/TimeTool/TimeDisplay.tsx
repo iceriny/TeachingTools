@@ -11,12 +11,52 @@ export interface TimeDisplayProps {
     i: number;
     s: number;
     size?: 1 | 2 | 3 | 4 | 5;
+    show?: ("y" | "m" | "d" | "h" | "i" | "s")[];
 }
-const SizeMap = [5, 4, 3, 2, 1] as const;
+const SizeMap = [1, 1.5, 1.8, 2.2, 3] as const;
 const FontSizeMap = [0.5, 0.9, 1, 1.2, 1.6];
-const TimeDisplay: FC<TimeDisplayProps> = ({ y, m, d, h, i, s, size = 3 }) => {
+
+interface TimeDisplayItemProps {
+    value: number;
+    unit: string;
+    fontSize: string;
+    color: string;
+}
+const TimeDisplayItem: FC<TimeDisplayItemProps> = ({
+    value,
+    unit,
+    fontSize,
+    color,
+}) => {
+    return (
+        <>
+            {value}
+            <span
+                style={{
+                    fontSize: fontSize,
+                    color: color,
+                }}
+            >
+                <Typography.Text style={{ fontWeight: 100 }}>
+                    {unit}
+                </Typography.Text>
+            </span>{" "}
+        </>
+    );
+};
+const TimeDisplay: FC<TimeDisplayProps> = ({
+    y,
+    m,
+    d,
+    h,
+    i,
+    s,
+    size = 3,
+    show = ["y", "m", "d", "h", "i", "s"],
+}) => {
     const { token } = useToken();
     const fontSize = `${FontSizeMap[size - 1]}rem`;
+    const numberSize = `${SizeMap[size - 1]}rem`;
 
     return (
         <div
@@ -24,40 +64,41 @@ const TimeDisplay: FC<TimeDisplayProps> = ({ y, m, d, h, i, s, size = 3 }) => {
                 textAlign: "center",
             }}
         >
-            <Typography.Title
-                level={SizeMap[size - 1]}
-                style={{ width: "100%" }}
+            <Typography.Text
+                style={{
+                    width: "100%",
+                    fontWeight: token.fontWeightStrong,
+                    fontSize: numberSize,
+                }}
             >
-                {y}
-                <span
-                    style={{
-                        fontSize: fontSize,
-                        color: token.colorTextDescription,
-                    }}
-                >
-                    年
-                </span>{" "}
-                {m}
-                <span
-                    style={{
-                        fontSize: fontSize,
-                        color: token.colorTextDescription,
-                    }}
-                >
-                    月
-                </span>{" "}
-                {d}
-                <span
-                    style={{
-                        fontSize: fontSize,
-                        color: token.colorTextDescription,
-                    }}
-                >
-                    日
-                </span>{" "}
-                {`${h}`.padStart(2, "0")}:{`${i}`.padStart(2, "0")}:
-                {`${s}`.padStart(2, "0")}
-            </Typography.Title>
+                {show.includes("y") && (
+                    <TimeDisplayItem
+                        value={y}
+                        unit="年"
+                        fontSize={fontSize}
+                        color={token.colorTextDescription}
+                    />
+                )}
+                {show.includes("m") && (
+                    <TimeDisplayItem
+                        value={m}
+                        unit="月"
+                        fontSize={fontSize}
+                        color={token.colorTextDescription}
+                    />
+                )}
+                {show.includes("d") && (
+                    <TimeDisplayItem
+                        value={d}
+                        unit="日"
+                        fontSize={fontSize}
+                        color={token.colorTextDescription}
+                    />
+                )}
+                {show.includes("h") && `${h}:`.padStart(3, "0")}
+                {show.includes("i") && `${i}:`.padStart(3, "0")}
+                {show.includes("s") && `${s}`.padStart(2, "0")}
+            </Typography.Text>
         </div>
     );
 };
