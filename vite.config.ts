@@ -15,35 +15,41 @@ export default defineConfig({
     define: {
         __APP_VERSION__: `"${appVersion}"`,
     },
-    build: {
-        rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                      if (id.includes('antd')) {
-                        return 'antd'; // 单独为 antd 提取一个 chunk
-                      }
-                      if (id.includes('highlight.js')) {
-                        const mach = id.match(/node_modules\/highlight.js\/lib\/languages\/([^.]+)\.js/);
-                        console.log(mach);
-                        return `highlight${mach ? mach[1] : ''}`;
-                      }
-                      if (id.includes('react-syntax-highlighter')) {
-                        return 'syntax-highlighter';
-                      }
-                      if (id.includes('jsqr')) {
-                        return 'jsqr';
-                      }
-                      if (id.includes('refractor/lang')) {
-                        return 'refractor-lang';
-                      }
-                      return 'vendor'; // 其他第三方库统一打包成 vendor.[hash].js
-                    }
-                    if (id.includes('src/components')) {
-                      return 'components'; // 所有组件提取到 components.[hash].js
-                    }
-                  },
-            },
-        },
-    },
+    // build: {
+    //     rollupOptions: {
+    //         output: {
+    //             manualChunks(id) {
+    //                 if (id.includes("node_modules")) {
+    //                     if (id.includes("react") || id.includes("react-dom")) {
+    //                         return "react-vendor"; // 将 React 和 React DOM 打包到一起
+    //                     }
+    //                     if (id.includes("antd")) {
+    //                         return "antd"; // 单独为 antd 提取一个 chunk
+    //                     }
+    //                     if (id.includes("highlight.js")) {
+    //                         const match = id.match(
+    //                             /node_modules\/highlight.js\/lib\/languages\/([^.]+)\.js/
+    //                         );
+    //                         if (match) {
+    //                             return `highlight-${match[1]}`;
+    //                         }
+    //                     }
+    //                     if (id.includes("react-syntax-highlighter")) {
+    //                         return "syntax-highlighter";
+    //                     }
+    //                     if (id.includes("jsqr")) {
+    //                         return "jsqr";
+    //                     }
+    //                     if (id.includes("refractor/lang")) {
+    //                         return "refractor-lang";
+    //                     }
+    //                     return "vendor"; // 其他第三方库统一打包成 vendor.[hash].js
+    //                 }
+    //                 if (id.includes("src/components")) {
+    //                     return "components"; // 所有组件提取到 components.[hash].js
+    //                 }
+    //             },
+    //         },
+    //     },
+    // },
 });
