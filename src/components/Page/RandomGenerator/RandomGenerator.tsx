@@ -216,7 +216,7 @@ const RandomGenerator: React.FC = () => {
                     onChange={(event) =>
                         setRandomData({
                             ...randomData,
-                            min: event || 0,
+                            min: event === null ? 100 : event,
                         })
                     }
                 />
@@ -227,7 +227,7 @@ const RandomGenerator: React.FC = () => {
                     onChange={(event) =>
                         setRandomData({
                             ...randomData,
-                            max: event || 100,
+                            max: event === null ? 100 : event,
                         })
                     }
                 />
@@ -242,7 +242,7 @@ const RandomGenerator: React.FC = () => {
                         onChange={(event) =>
                             setRandomData({
                                 ...randomData,
-                                length: event || 10,
+                                length: event === null ? 10 : event,
                             })
                         }
                     />
@@ -253,11 +253,15 @@ const RandomGenerator: React.FC = () => {
                     <InputNumber
                         changeOnWheel
                         addonBefore="精度: "
-                        defaultValue={randomData.precision || 2}
+                        defaultValue={
+                            randomData.precision === undefined
+                                ? 2
+                                : randomData.precision
+                        }
                         onChange={(event) =>
                             setRandomData({
                                 ...randomData,
-                                precision: event || 2,
+                                precision: event === null ? 2 : event,
                             })
                         }
                     />
