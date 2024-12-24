@@ -74,8 +74,8 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
     const [searchKey, setSearchKey] = useState<string[]>([]);
     const searchRef = useRef<InputRef>(null);
     const color = [
-        localStorage.getItem("primaryColor"),
-        localStorage.getItem("bgColor"),
+        localStorage.getItem("primaryColor") ?? DEFAULT_PRIMARY_COLOR,
+        localStorage.getItem("bgColor") ?? DEFAULT_BG_COLOR,
     ];
 
     useEffect(() => {
@@ -245,6 +245,7 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
                             <Flex gap={50} align="end">
                                 主题色:
                                 <ColorPicker
+                                    disabledAlpha
                                     defaultValue={color[0]}
                                     presets={[
                                         {
@@ -265,6 +266,7 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
                             <Flex gap={50} align="end">
                                 背景色:
                                 <ColorPicker
+                                    disabledAlpha
                                     defaultValue={color[1]}
                                     presets={[
                                         {

@@ -46,15 +46,10 @@ const getVersionDesc = () => {
 };
 
 // 获取本地存储的色值
-const localStoragePrimaryColor = localStorage.getItem("primaryColor");
 let localStorageColor = [
-    localStoragePrimaryColor ?? DEFAULT_PRIMARY_COLOR,
+    localStorage.getItem("primaryColor") ?? DEFAULT_PRIMARY_COLOR,
     localStorage.getItem("bgColor") ?? DEFAULT_BG_COLOR,
 ];
-if (!localStoragePrimaryColor) {
-    localStorage.setItem("primaryColor", localStorageColor[0]);
-    localStorage.setItem("bgColor", localStorageColor[1]);
-}
 
 function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);

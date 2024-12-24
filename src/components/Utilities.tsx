@@ -114,7 +114,7 @@ function getDarkBgColor(lightBgColor: string) {
     return adjustColor(lightBgColor, -10, -80);
 }
 const DEFAULT_PRIMARY_COLOR = "#a66595";
-const DEFAULT_BG_COLOR = "#eae3e8";
+const DEFAULT_BG_COLOR = "#ffffff";
 export {
     useLastStage,
     adjustColor,
