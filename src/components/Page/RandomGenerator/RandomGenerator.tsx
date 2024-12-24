@@ -1,4 +1,8 @@
-import { DownOutlined, QuestionOutlined } from "@ant-design/icons";
+import {
+    DeleteOutlined,
+    DownOutlined,
+    QuestionOutlined,
+} from "@ant-design/icons";
 import {
     Button,
     Card,
@@ -323,6 +327,16 @@ const RandomGenerator: React.FC = () => {
                             </Space>
                         </Card>
                     )
+                )}
+                {randomResults.length > 0 && (
+                    <Button
+                        style={{ marginLeft: "2rem" }}
+                        onClick={() => {
+                            setRandomResults([]);
+                        }}
+                        danger
+                        icon={<DeleteOutlined />}
+                    />
                 )}
             </Space>
         </Space>

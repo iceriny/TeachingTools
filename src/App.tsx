@@ -14,7 +14,7 @@ const Modal = lazy(() =>
 );
 import VersionJson from "./assets/version.json";
 
-const VERSION_DATA: VersionData = VersionJson as VersionData;
+const VERSION_DATA: VersionMap = VersionJson as VersionMap;
 const OLD_VERSION = localStorage.getItem("version");
 
 const getVersionDesc = () => {
@@ -22,14 +22,12 @@ const getVersionDesc = () => {
     if (!OLD_VERSION) {
         for (let key in VERSION_DATA) {
             const data = VERSION_DATA[key as VersionNumber];
-            if (key != "last")
-                result.push({ version: key as VersionNumber, desc: data.desc });
+            result.push({ version: key as VersionNumber, desc: data.desc });
         }
         return result;
     }
 
     for (const key in VERSION_DATA) {
-        if (key === "last") continue;
         const updateMask = compareVersions(key, OLD_VERSION);
         if (updateMask === 1) {
             // 更新日志显示:
@@ -58,7 +56,7 @@ function App() {
         setIsModalOpen(false);
     };
     return (
-        <>
+        <ConfigProvider locale={locale}>
             <Suspense
                 fallback={
                     <div
@@ -74,9 +72,7 @@ function App() {
                     </div>
                 }
             >
-                <ConfigProvider locale={locale}>
-                    <Main />
-                </ConfigProvider>
+                <Main />
             </Suspense>
             <Suspense>
                 <Modal
@@ -98,7 +94,11 @@ function App() {
                         {getVersionDesc().map((item, index) => (
                             <List
                                 key={index}
-                                header={`v${item.version}`}
+                                header={
+                                    <span
+                                        style={{ fontWeight: 500 }}
+                                    >{`v${item.version}`}</span>
+                                }
                                 bordered
                                 size="small"
                                 dataSource={item.desc}
@@ -111,7 +111,7 @@ function App() {
                     </Space>
                 </Modal>
             </Suspense>
-        </>
+        </ConfigProvider>
     );
 }
 

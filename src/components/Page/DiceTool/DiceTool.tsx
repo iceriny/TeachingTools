@@ -185,8 +185,9 @@ const DiceTool: React.FC = () => {
                         )}
                         // onConfirm={confirm}
                         // onCancel={cancel}
-                        okText="Yes"
-                        cancelText="No"
+                        showCancel={false}
+                        // okText="Yes"
+                        // cancelText="No"
                     >
                         <Button type="link" icon={<QuestionOutlined />} />
                     </Popconfirm>
