@@ -9,6 +9,8 @@ import {
     Input,
     Layout,
     Menu,
+    Popconfirm,
+    ColorPicker,
     theme,
 } from "antd";
 import type { InputRef, MenuProps } from "antd";
@@ -16,6 +18,8 @@ import {
     AppstoreOutlined,
     HomeOutlined,
     SearchOutlined,
+    MoonOutlined,
+    BgColorsOutlined,
 } from "@ant-design/icons";
 import Tool, { ToolName } from "../../Tools/BaseTool";
 
@@ -36,6 +40,7 @@ import TTimeTool from "../../Tools/TTimeTool";
 import Home from "../Page/Home";
 import YellowPage from "./YellowPage";
 import Clock from "../Page/TimeTool/Clock";
+import { DEFAULT_BG_COLOR, DEFAULT_PRIMARY_COLOR } from "../Utilities";
 
 const { Content, Footer, Sider } = Layout;
 
@@ -51,17 +56,27 @@ const contentSizeData = {
     padding: 24,
     minHeight: 900,
 };
-const Main: React.FC = () => {
+interface MainProps {
+    themeChange: () => void;
+    colorChange: (color: string, type: "primaryColor" | "bgColor") => void;
+}
+const YellowPageIcon = <AppstoreOutlined />;
+const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { colorBgContainer, borderRadiusLG, marginLG },
     } = theme.useToken();
 
     const [currentPage, setCurrentPage] = useState<PageName>("nav_Home");
     const [isOpenYellowPage, setIsOpenYellowPage] = useState(false);
+    const [isDark, setIsDark] = useState(false);
 
     const [searchPrepare, setSearchPrepare] = useState(false);
     const [searchKey, setSearchKey] = useState<string[]>([]);
     const searchRef = useRef<InputRef>(null);
+    const color = [
+        localStorage.getItem("primaryColor"),
+        localStorage.getItem("bgColor"),
+    ];
 
     useEffect(() => {
         if (searchRef.current) {
@@ -214,12 +229,78 @@ const Main: React.FC = () => {
                     TeachingTool ©{new Date().getFullYear()} Created by Iceriny
                 </Footer>
             </Layout>
-            <FloatButton
+            <FloatButton.Group
+                trigger="hover"
                 type="primary"
-                icon={<AppstoreOutlined />}
+                icon={YellowPageIcon}
+                closeIcon={YellowPageIcon}
                 tooltip={<div>工具黄页</div>}
                 onClick={() => setIsOpenYellowPage(true)}
-            />
+            >
+                <Popconfirm
+                    placement="right"
+                    title="定制主题色"
+                    description={
+                        <Flex gap={10} vertical style={{ margin: "20px" }}>
+                            <Flex gap={50} align="end">
+                                主题色:
+                                <ColorPicker
+                                    defaultValue={color[0]}
+                                    presets={[
+                                        {
+                                            label: "默认",
+                                            colors: [DEFAULT_PRIMARY_COLOR],
+                                        },
+                                    ]}
+                                    onChange={(e) => {
+                                        const color = e.toHexString();
+                                        colorChange(color, "primaryColor");
+                                        localStorage.setItem(
+                                            "primaryColor",
+                                            color
+                                        );
+                                    }}
+                                />
+                            </Flex>
+                            <Flex gap={50} align="end">
+                                背景色:
+                                <ColorPicker
+                                    defaultValue={color[1]}
+                                    presets={[
+                                        {
+                                            label: "默认",
+                                            colors: [DEFAULT_BG_COLOR],
+                                        },
+                                    ]}
+                                    onChange={(e) => {
+                                        const color = e.toHexString();
+                                        colorChange(color, "bgColor");
+                                        localStorage.setItem("bgColor", color);
+                                    }}
+                                />
+                            </Flex>
+                        </Flex>
+                    }
+                    showCancel={false}
+                >
+                    <FloatButton
+                        style={{ insetInlineEnd: marginLG * 3 }}
+                        type="default"
+                        icon={<BgColorsOutlined />}
+                        tooltip={<div>定制颜色</div>}
+                    />
+                </Popconfirm>
+                <FloatButton
+                    style={{ insetInlineEnd: marginLG * 3 }}
+                    type={isDark ? "primary" : "default"}
+                    icon={<MoonOutlined />}
+                    tooltip={<div>暗黑模式</div>}
+                    onClick={() => {
+                        themeChange();
+                        setIsDark(!isDark);
+                    }}
+                />
+            </FloatButton.Group>
             <Drawer
                 open={isOpenYellowPage}
                 onClose={() => {

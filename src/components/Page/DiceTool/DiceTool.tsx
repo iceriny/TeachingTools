@@ -115,7 +115,7 @@ const DiceTool: React.FC = () => {
                                       size={100}
                                       key={index}
                                       index={index}
-                                      acitive={dicesStage[index]}
+                                      active={dicesStage[index]}
                                       n={dice}
                                       onClick={HandleDiceClick}
                                   />

@@ -1,10 +1,10 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 // 动态加载组件
 // import Main from "./components/Main";
 const Main = lazy(() => import("./components/Main"));
 
 import { compareVersions } from "compare-versions";
-import { Space, Spin, List, ConfigProvider } from "antd";
+import { Space, Spin, List, ConfigProvider, theme } from "antd";
 import locale from "antd/locale/zh_CN";
 
 const Modal = lazy(() =>
@@ -13,9 +13,16 @@ const Modal = lazy(() =>
     }))
 );
 import VersionJson from "./assets/version.json";
+import {
+    DEFAULT_BG_COLOR,
+    DEFAULT_PRIMARY_COLOR,
+    getDarkBgColor,
+} from "./components/Utilities";
 
 const VERSION_DATA: VersionMap = VersionJson as VersionMap;
 const OLD_VERSION = localStorage.getItem("version");
+
+const { darkAlgorithm } = theme;
 
 const getVersionDesc = () => {
     const result: { version: VersionNumber; desc: string[] }[] = [];
@@ -37,8 +44,34 @@ const getVersionDesc = () => {
     }
     return result;
 };
+
+// 获取本地存储的色值
+const localStoragePrimaryColor = localStorage.getItem("primaryColor");
+let localStorageColor = [
+    localStoragePrimaryColor ?? DEFAULT_PRIMARY_COLOR,
+    localStorage.getItem("bgColor") ?? DEFAULT_BG_COLOR,
+];
+if (!localStoragePrimaryColor) {
+    localStorage.setItem("primaryColor", localStorageColor[0]);
+    localStorage.setItem("bgColor", localStorageColor[1]);
+}
+
 function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDark, setIsDark] = useState(false);
+    const [color, setColor] = useState<[string, string]>([
+        localStorageColor[0],
+        localStorageColor[1],
+    ]);
+
+    const myDarkAlgorithm = useCallback<typeof darkAlgorithm>(
+        (token) => {
+            token.colorBgBase = getDarkBgColor(color[1]);
+            const map = darkAlgorithm(token);
+            return map;
+        },
+        [color]
+    );
     useEffect(() => {
         // 获取用户的旧版本号
         if (OLD_VERSION) {
@@ -55,8 +88,36 @@ function App() {
     const handleOk = () => {
         setIsModalOpen(false);
     };
+    const handleThemeChange = () => {
+        setIsDark(!isDark);
+    };
+    const handleChangePrimaryColor = (
+        colorString: string,
+        type: "primaryColor" | "bgColor"
+    ) => {
+        if (type === "primaryColor") setColor([colorString, color[1]]);
+        else setColor([color[0], colorString]);
+    };
+    const myTheme = {
+        algorithm: isDark ? myDarkAlgorithm : undefined,
+        token: {
+            borderRadius: 8,
+            wireframe: false,
+            colorPrimary: color[0],
+            colorInfo: color[0],
+            colorSuccess: "#1ac48e",
+            colorBgBase: color[1],
+        },
+        components: isDark
+            ? undefined
+            : {
+                  Tooltip: {
+                      colorBgSpotlight: color[0],
+                  },
+              },
+    };
     return (
-        <ConfigProvider locale={locale}>
+        <ConfigProvider locale={locale} theme={myTheme}>
             <Suspense
                 fallback={
                     <div
@@ -72,7 +133,10 @@ function App() {
                     </div>
                 }
             >
-                <Main />
+                <Main
+                    themeChange={handleThemeChange}
+                    colorChange={handleChangePrimaryColor}
+                />
             </Suspense>
             <Suspense>
                 <Modal
