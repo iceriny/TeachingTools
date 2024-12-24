@@ -95,23 +95,47 @@ function rgbToHex({ r, g, b }: RGB): string {
 }
 
 // 修改亮度和饱和度，保持色相不变
+/**
+ *
+ * @param hex 要修改的颜色
+ * @param param1 参数 [hueDelta: 色相调整量, saturationFactor: 饱和度调整因子, lightnessFactor: 亮度调整因子]
+ * @returns
+ */
 function adjustColor(
     hex: string,
-    saturationDelta: number,
-    lightnessDelta: number
+    [hueDelta, saturationFactor, lightnessFactor]: [number, number, number]
 ): string {
+    if (hueDelta === 0 && saturationFactor === 1 && lightnessFactor === 1)
+        return hex;
     const rgb = hexToRgb(hex);
     const hsl = rgbToHsl(rgb);
 
-    // 调整亮度和饱和度
-    hsl.s = Math.min(100, Math.max(0, hsl.s + saturationDelta));
-    hsl.l = Math.min(100, Math.max(0, hsl.l + lightnessDelta));
+    // 调整色相, 亮度和饱和度
+    if (hueDelta !== 0) {
+        const h = hsl.h + (hueDelta % 360);
+        hsl.h = h < 0 ? h + 360 : h;
+    }
+    if (saturationFactor !== 1) {
+        hsl.s = Math.min(100, Math.max(0, hsl.s * saturationFactor));
+    }
+    if (lightnessFactor !== 1) {
+        hsl.l = Math.min(100, Math.max(0, hsl.l * lightnessFactor));
+    }
 
     const adjustedRgb = hslToRgb(hsl);
     return rgbToHex(adjustedRgb);
 }
 function getDarkBgColor(lightBgColor: string) {
-    return adjustColor(lightBgColor, -10, -80);
+    const rgb = hexToRgb(lightBgColor);
+    const hsl = rgbToHsl(rgb);
+
+    // 调整亮度和饱和度
+    hsl.s = Math.min(100, Math.max(0, hsl.s + -10));
+    hsl.l = Math.min(100, Math.max(0, hsl.l * 0.1));
+
+    const adjustedRgb = hslToRgb(hsl);
+
+    return rgbToHex(adjustedRgb);
 }
 const DEFAULT_PRIMARY_COLOR = "#a66595";
 const DEFAULT_BG_COLOR = "#ffffff";

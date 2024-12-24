@@ -1,10 +1,11 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 // 动态加载组件
 // import Main from "./components/Main";
 const Main = lazy(() => import("./components/Main"));
 
 import { compareVersions } from "compare-versions";
 import { Space, Spin, List, ConfigProvider, theme } from "antd";
+import type { SeedToken } from "antd/es/theme/internal";
 import locale from "antd/locale/zh_CN";
 
 const Modal = lazy(() =>
@@ -23,7 +24,11 @@ const VERSION_DATA: VersionMap = VersionJson as VersionMap;
 const OLD_VERSION = localStorage.getItem("version");
 
 const { darkAlgorithm } = theme;
-
+function myDarkAlgorithm(token: SeedToken) {
+    token.colorBgBase = getDarkBgColor(token.colorBgBase);
+    const map = darkAlgorithm(token);
+    return map;
+}
 const getVersionDesc = () => {
     const result: { version: VersionNumber; desc: string[] }[] = [];
     if (!OLD_VERSION) {
@@ -59,14 +64,6 @@ function App() {
         localStorageColor[1],
     ]);
 
-    const myDarkAlgorithm = useCallback<typeof darkAlgorithm>(
-        (token) => {
-            token.colorBgBase = getDarkBgColor(color[1]);
-            const map = darkAlgorithm(token);
-            return map;
-        },
-        [color]
-    );
     useEffect(() => {
         // 获取用户的旧版本号
         if (OLD_VERSION) {
