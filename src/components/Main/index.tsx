@@ -250,7 +250,11 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
                                     presets={[
                                         {
                                             label: "默认",
-                                            colors: [DEFAULT_PRIMARY_COLOR],
+                                            colors: [
+                                                DEFAULT_PRIMARY_COLOR,
+                                                "#1677ff",
+                                                "#e49a33",
+                                            ],
                                         },
                                     ]}
                                     onChange={(e) => {
