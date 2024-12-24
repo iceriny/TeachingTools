@@ -1,8 +1,22 @@
 import { useState, createElement, useRef, useEffect } from "react";
 // import { BankOutlined } from "@ant-design/icons";
-import { Divider, Drawer, FloatButton, Input, Layout, Menu, theme } from "antd";
+import {
+    Button,
+    Divider,
+    Drawer,
+    Flex,
+    FloatButton,
+    Input,
+    Layout,
+    Menu,
+    theme,
+} from "antd";
 import type { InputRef, MenuProps } from "antd";
-import { AppstoreOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+    AppstoreOutlined,
+    HomeOutlined,
+    SearchOutlined,
+} from "@ant-design/icons";
 import Tool, { ToolName } from "../../Tools/BaseTool";
 
 // 菜单显示顺序依赖于 Tool.getAllTools()
@@ -39,13 +53,7 @@ const contentSizeData = {
 };
 const Main: React.FC = () => {
     const {
-        token: {
-            colorBgContainer,
-            borderRadiusLG,
-            colorPrimary,
-            colorText,
-            colorBgTextHover,
-        },
+        token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
     const [currentPage, setCurrentPage] = useState<PageName>("nav_Home");
@@ -121,37 +129,11 @@ const Main: React.FC = () => {
                         <Divider style={{ margin: "8px 0 8px 0" }} />
                     </div>
                 )}
-                <div
-                    style={{
-                        width: "100%",
-                        background: colorBgContainer,
-                        borderRadius: borderRadiusLG,
-                        marginBottom: "10px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        transition:
-                            "color .5s ease-in-out, background .5s ease-in-out",
-                    }}
-                    onClick={() => {
-                        setSearchPrepare(true);
-                        // setTimeout(() => {
-                        //     searchRef.current?.focus();
-                        // }, 50);
-                    }}
-                    onMouseEnter={(event) => {
-                        event.currentTarget.style.color = colorPrimary;
-                        event.currentTarget.style.background = colorBgTextHover;
-                    }}
-                    onMouseLeave={(event) => {
-                        event.currentTarget.style.color = colorText;
-                        event.currentTarget.style.background = colorBgContainer;
-                    }}
-                >
+                <Flex gap={10}>
                     <Input
                         ref={searchRef}
                         placeholder="搜索"
+                        addonBefore={<SearchOutlined />}
                         style={{
                             width: "100%",
                             display: searchPrepare ? "block" : "none",
@@ -176,14 +158,31 @@ const Main: React.FC = () => {
                             setSearchPrepare(false);
                         }}
                     />
-                    <SearchOutlined
+                    <Button
                         style={{
-                            display: searchPrepare ? "none" : "block",
-                            fontSize: "1rem",
-                            padding: ".5rem",
+                            display: searchPrepare ? "none" : undefined,
+                            width: currentPage === "nav_Home" ? "100%" : "25%",
+                        }}
+                        type={currentPage === "nav_Home" ? "text" : undefined}
+                        icon={<SearchOutlined />}
+                        onClick={() => {
+                            setSearchPrepare(true);
                         }}
                     />
-                </div>
+                    <Button
+                        style={{
+                            width: "100%",
+                            display:
+                                searchPrepare || currentPage === "nav_Home"
+                                    ? "none"
+                                    : undefined,
+                        }}
+                        icon={<HomeOutlined />}
+                        onClick={() => {
+                            setCurrentPage("nav_Home");
+                        }}
+                    />
+                </Flex>
                 <Menu
                     theme="light"
                     mode="inline"
@@ -195,6 +194,7 @@ const Main: React.FC = () => {
                                 .includes(key.toLowerCase());
                         });
                     })}
+                    selectedKeys={[currentPage]}
                     onClick={HandleMenuClick}
                 />
             </Sider>
