@@ -10,6 +10,7 @@ declare global {
     };
     interface Window {
         isFirst: boolean;
+        NOTIFICATION_KEY: "NOTIFICATION";
     }
 }
 

@@ -21,6 +21,7 @@ import { useState } from "react";
 import { valueType } from "antd/es/statistic/utils";
 import TRandomGenerator from "../../../Tools/TRandomGenerator";
 import { NotificationInstance } from "antd/es/notification/interface";
+import Paragraphs from "../../Paragraphs";
 
 type randomType =
     | "int"
@@ -153,7 +154,7 @@ const RandomGenerator: React.FC<RandomGeneratorProps> = ({ notifyApi }) => {
     const [randomResults, setRandomResults] = useState<RandomResult[]>([]);
     const openNotification = () => {
         notifyApi.open({
-            key: __NOTIFICATION_KEY__,
+            key: NOTIFICATION_KEY,
             message: (
                 <>
                     <Typography.Title level={5}>
@@ -167,37 +168,32 @@ const RandomGenerator: React.FC<RandomGeneratorProps> = ({ notifyApi }) => {
             description: (
                 <>
                     <Divider />
-                    <Typography.Paragraph>
-                        生成器是生成随机数的简单工具
-                    </Typography.Paragraph>
-                    <Typography.Paragraph>
-                        最常用的方法就是在最小值和最大值之间生成一个随机数.
-                    </Typography.Paragraph>
-                    <Typography.Paragraph>
-                        默认生成整数, 请在下拉列表中选择需要生成的类型.
-                    </Typography.Paragraph>
-                    <Typography.Paragraph>
-                        浮点数就是带小数的数字, 选择浮点数时会有额外的
-                        <Typography.Text type="success">精度</Typography.Text>
-                        设置框
-                    </Typography.Paragraph>
-                    <Typography.Paragraph>
-                        数组生成模式, 会有一个额外的
-                        <Typography.Text type="success">数量</Typography.Text>
-                        设置框, 表示要生成随机数的数量, 即可以{" "}
-                        <Typography.Text type="success">
-                            批量生成
-                        </Typography.Text>
-                    </Typography.Paragraph>
-                    <Typography.Paragraph>
-                        按组生成模式下, 程序会先将你设置的范围,
-                        按你所设置的数量平均分组, 然后每组随机抽取一个值.
-                    </Typography.Paragraph>
-                    <Typography>
-                        按组生成的模式, 它的结果更加均匀,
-                        不会出现普通模式中比较极端的情况, 例如1~10中抽取3个,
-                        结果是 1, 2, 4 集中在前部.
-                    </Typography>
+                    <Paragraphs
+                        strings={[
+                            "生成器是生成随机数的简单工具",
+                            "最常用的方法就是在最小值和最大值之间生成一个随机数.",
+                            "默认生成整数, 请在下拉列表中选择需要生成的类型.",
+                            <>
+                                浮点数就是带小数的数字, 选择浮点数时会有额外的
+                                <Typography.Text type="success">
+                                    精度
+                                </Typography.Text>
+                                设置框
+                            </>,
+                            <>
+                                数组生成模式, 会有一个额外的
+                                <Typography.Text type="success">
+                                    数量
+                                </Typography.Text>
+                                设置框, 表示要生成随机数的数量, 即可以{" "}
+                                <Typography.Text type="success">
+                                    批量生成
+                                </Typography.Text>
+                            </>,
+                            "按组生成模式下, 程序会先将你设置的范围,按你所设置的数量平均分组, 然后每组随机抽取一个值.",
+                            "按组生成的模式, 它的结果更加均匀,不会出现普通模式中比较极端的情况, 例如1~10中抽取3个,结果是 1, 2, 4 集中在前部.",
+                        ]}
+                    />
                 </>
             ),
             showProgress: true,

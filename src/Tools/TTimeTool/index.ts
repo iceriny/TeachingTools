@@ -61,7 +61,11 @@ class TTimeTool extends Tool<typeof TimeTool> {
             .set("second", 0)
             .set("millisecond", 0);
     }
-
+    /**
+     * 更新指定计时器的时间
+     * @param key 计时器的唯一键
+     * @returns 返回更新后的计时信息，如果未找到计时器则返回undefined
+     */
     private singleUpdateTime(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined) return;
@@ -71,6 +75,11 @@ class TTimeTool extends Tool<typeof TimeTool> {
         timing.prevT = now;
         return timing;
     }
+
+    /**
+     * 启动或更新指定计时器的时间，并在50毫秒后再次调用自身
+     * @param key 计时器的唯一键
+     */
     private updateTime(key: symbol) {
         const timing = this.singleUpdateTime(key);
         if (timing === undefined) return;
@@ -78,6 +87,13 @@ class TTimeTool extends Tool<typeof TimeTool> {
             this.updateTime(key);
         }, 50);
     }
+
+    /**
+     * 开始一个新的计时器或重置一个现有的计时器
+     * @param callback 计时器每次更新时调用的回调函数，接收经过的时间作为参数
+     * @param key 计时器的唯一键，如果未提供则自动生成
+     * @returns 返回计时器的唯一键
+     */
     startTiming(callback: (t: number) => void, key?: symbol) {
         if (key === undefined) {
             key = Symbol();
@@ -96,6 +112,12 @@ class TTimeTool extends Tool<typeof TimeTool> {
         this.updateTime(key);
         return key;
     }
+
+    /**
+     * 暂停指定计时器，并更新其累计时间
+     * @param key 计时器的唯一键
+     * @returns 返回暂停时累计的时间，如果未找到计时器则返回undefined
+     */
     pauseTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined || timing.interval === null) return;
@@ -104,12 +126,23 @@ class TTimeTool extends Tool<typeof TimeTool> {
         this.singleUpdateTime(key);
         return timing.t;
     }
+
+    /**
+     * 恢复指定计时器
+     * @param key 计时器的唯一键
+     */
     resumeTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined || timing.interval) return;
         timing.prevT = performance.now();
         this.updateTime(key);
     }
+
+    /**
+     * 停止并移除指定计时器
+     * @param key 计时器的唯一键
+     * @returns 返回停止时累计的时间，如果未找到计时器则返回undefined
+     */
     stopTiming(key: symbol) {
         const timing = this.timingTimes.get(key);
         if (timing === undefined) return;
@@ -123,6 +156,7 @@ class TTimeTool extends Tool<typeof TimeTool> {
         this.timingTimes.delete(key);
         return result;
     }
+
     static readonly TIME_UNITS_IN_MS: Record<
         Exclude<RangeType, "quarter">,
         number
@@ -164,6 +198,15 @@ class TTimeTool extends Tool<typeof TimeTool> {
         // 通过毫秒为基准进行单位换算
         return (value * sourceFactor) / targetFactor;
     }
+    /**
+     * 计算时间或持续时间的加减操作
+     *
+     * 此函数接受一个参数数组，每个参数包含一个值、一个符号和一个可选的范围类型
+     * 它根据这些参数来计算时间或持续时间的加减结果
+     *
+     * @param args 参数数组，包含计算所需的时间或持续时间值、计算符号和范围类型
+     * @returns 返回计算结果，可能是一个 Dayjs 实例或一个 Duration 实例
+     */
     calculate(
         args: {
             value: number | Dayjs;
@@ -180,22 +223,27 @@ class TTimeTool extends Tool<typeof TimeTool> {
                 | undefined;
         }[]
     ) {
+        // 如果参数数组为空，则返回一个表示 0 的持续时间
         if (args.length === 0) return dayjs.duration(0);
 
         let firstValue = args[0].value;
         let firstValueType = args[0].rangeType;
 
+        // 如果第一个参数的值是一个时间点，则进行时间点的计算
         if (isPointTime(firstValue)) {
             return args.reduce<dayjs.Dayjs | Duration>((prev, cur, index) => {
+                // 对于第一个参数之后的每个参数，根据其值和符号进行计算
                 if (index === 0) return prev;
 
                 let curValue = cur.value;
                 let curValueType = cur.rangeType;
 
+                // 如果当前参数的值是一个时间点，则计算前一个值与当前值的时间差
                 if (isPointTime(curValue)) {
                     prev = prev as dayjs.Dayjs;
                     return dayjs.duration(prev.diff(curValue));
                 } else {
+                    // 如果当前参数的范围类型是季度，则将其转换为月
                     if (curValueType === "quarter") {
                         curValue = this.conversion(
                             curValue,
@@ -204,51 +252,69 @@ class TTimeTool extends Tool<typeof TimeTool> {
                         );
                         curValueType = "month";
                     }
+                    // 根据前一个值的类型和当前参数的符号进行加减操作
                     if (isDayjs(prev)) {
+                        // 如果前一个值是一个时间点，则进行加减操作
                         switch (cur.symbol) {
                             case "+":
                                 return prev.add(curValue, curValueType);
                             case "-":
                                 return prev.subtract(curValue, curValueType);
                         }
-                    }
-                    const theDuration = dayjs.duration(curValue, curValueType);
-                    switch (cur.symbol) {
-                        case "+":
-                            return prev.add(theDuration);
-                        case "-":
-                            return prev.subtract(theDuration);
+                    } else {
+                        // 如果前一个值是一个持续时间，则进行加减操作
+                        const theDuration = dayjs.duration(
+                            curValue,
+                            curValueType
+                        );
+                        switch (cur.symbol) {
+                            case "+":
+                                return prev.add(theDuration);
+                            case "-":
+                                return prev.subtract(theDuration);
+                        }
                     }
                 }
             }, firstValue);
         } else {
+            // 如果第一个参数的范围类型是季度，则将其转换为月
             if (firstValueType === "quarter") {
                 firstValue = firstValue * 3;
                 firstValueType = "month";
             }
+            // 对于非时间点的参数，进行持续时间的计算
+            return args.reduce((prev, cur, index) => {
+                if (index === 0) return prev;
+
+                let curValue = cur.value as number;
+                let curValueType = cur.rangeType;
+
+                // 如果当前参数的范围类型是季度，则将其转换为月
+                if (curValueType === "quarter") {
+                    curValue *= 3;
+                    curValueType = "month";
+                }
+
+                const theDuration = dayjs.duration(curValue, curValueType);
+                // 根据当前参数的符号进行加减操作
+                switch (cur.symbol) {
+                    case "+":
+                        return prev.add(theDuration);
+                    case "-":
+                        return prev.subtract(theDuration);
+                }
+            }, dayjs.duration(firstValue, firstValueType as Exclude<RangeType, "quarter">));
         }
-
-        const result = args.reduce((prev, cur, index) => {
-            if (index === 0) return prev;
-
-            let curValue = cur.value as number;
-            let curValueType = cur.rangeType;
-
-            if (curValueType === "quarter") {
-                curValue *= 3;
-                curValueType = "month";
-            }
-
-            const theDuration = dayjs.duration(curValue, curValueType);
-            switch (cur.symbol) {
-                case "+":
-                    return prev.add(theDuration);
-                case "-":
-                    return prev.subtract(theDuration);
-            }
-        }, dayjs.duration(firstValue, firstValueType as Exclude<RangeType, "quarter">));
-        return result;
     }
+    /**
+     * 将给定的时间对象转换为一个包含时间单位的对象
+     * 此函数支持两种类型的时间输入：Dayjs 或 Duration
+     * 对于 Dayjs 类型，返回的是年、月、日、小时、分钟和秒
+     * 对于 Duration 类型，同样返回年、月、日、小时、分钟和秒
+     * 这样做的目的是为了提供一个统一的接口来处理不同类型的时间数据
+     * @param time {Dayjs | Duration} - 输入的时间对象，可以是 Dayjs 类型或 Duration 类型
+     * @returns 返回一个对象，包含年(y)、月(m)、日(d)、小时(h)、分钟(i)和秒(s)
+     */
     getTimeObj(time: Dayjs | Duration) {
         if (isDayjs(time)) {
             return {

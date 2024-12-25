@@ -82,7 +82,7 @@ if (window.isFirst) {
     HelpText.push("那么, 祝您生活愉快!");
 }
 const HelpContent: ArgsProps = {
-    key: __NOTIFICATION_KEY__,
+    key: NOTIFICATION_KEY,
     message: (
         <>
             <Typography.Title level={5}>欢迎使用</Typography.Title>
@@ -174,7 +174,7 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
     };
     const handleOpenAbout = () => {
         notifyApi.open({
-            key: __NOTIFICATION_KEY__,
+            key: NOTIFICATION_KEY,
             message: "关于",
             description: (
                 <Flex gap={10} vertical align="center">
