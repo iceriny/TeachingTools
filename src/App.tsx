@@ -4,13 +4,13 @@ import { useEffect, useState, lazy, Suspense } from "react";
 const Main = lazy(() => import("./components/Main"));
 
 import { compareVersions } from "compare-versions";
-import { Space, Spin, List, ConfigProvider, theme } from "antd";
+import { Space, Spin, List, ConfigProvider, theme, notification } from "antd";
 import type { SeedToken } from "antd/es/theme/internal";
 import locale from "antd/locale/zh_CN";
 
 const Modal = lazy(() =>
-    import("antd").then((module) => ({
-        default: module.Modal, // 指定要加载的命名导出
+    import("antd/es/modal").then((module) => ({
+        default: module.default,
     }))
 );
 import VersionJson from "./assets/version.json";
@@ -74,6 +74,7 @@ function App() {
         } else {
             // 第一次使用
             console.log("First use");
+            window.isFirst = true;
         }
         localStorage.setItem("version", __APP_VERSION__);
     }, []);
@@ -108,8 +109,11 @@ function App() {
                   },
               },
     };
+
+    const [notifyApi, contextHolder] = notification.useNotification();
     return (
         <ConfigProvider locale={locale} theme={myTheme}>
+            {contextHolder}
             <Suspense
                 fallback={
                     <div
@@ -126,6 +130,7 @@ function App() {
                 }
             >
                 <Main
+                    notifyApi={notifyApi}
                     themeChange={handleThemeChange}
                     colorChange={handleChangePrimaryColor}
                 />

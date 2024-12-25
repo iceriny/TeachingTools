@@ -35,7 +35,7 @@ const DiceTool: React.FC = () => {
         newDicesStage[index] = !newDicesStage[index];
         setDicesStage(newDicesStage);
     };
-    const HandleCancelSelect = (event: React.MouseEvent) => {
+    const HandleCancelSelect = (_: React.MouseEvent) => {
         setDicesStage(dicesStage.map(() => false));
     };
     const HandleSumClick = (event: React.MouseEvent) => {

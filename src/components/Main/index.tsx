@@ -12,6 +12,7 @@ import {
     Popconfirm,
     ColorPicker,
     theme,
+    Typography,
 } from "antd";
 import type { InputRef, MenuProps } from "antd";
 import {
@@ -20,6 +21,8 @@ import {
     SearchOutlined,
     MoonOutlined,
     BgColorsOutlined,
+    InfoOutlined,
+    QuestionOutlined,
 } from "@ant-design/icons";
 import Tool, { ToolName } from "../../Tools/BaseTool";
 
@@ -41,6 +44,9 @@ import Home from "../Page/Home";
 import YellowPage from "./YellowPage";
 import Clock from "../Page/TimeTool/Clock";
 import { DEFAULT_BG_COLOR, DEFAULT_PRIMARY_COLOR } from "../Utilities";
+import type { NotificationInstance } from "antd/es/notification/interface";
+import Paragraphs from "../Paragraphs";
+import { ArgsProps } from "antd/es/notification";
 
 const { Content, Footer, Sider } = Layout;
 
@@ -52,18 +58,61 @@ const items = Tool.getAllToolsList().map((tool) => ({
     label: tool.label,
 }));
 
+const aboutText = `TeachingTool ©${new Date().getFullYear()} Created by Iceriny`;
+
 const contentSizeData = {
     padding: 24,
     minHeight: 900,
 };
 interface MainProps {
+    notifyApi: NotificationInstance;
     themeChange: () => void;
     colorChange: (color: string, type: "primaryColor" | "bgColor") => void;
 }
 const YellowPageIcon = <AppstoreOutlined />;
-const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
+const HelpText = [
+    "本工具是一个多功能工具箱, 包含多种可用的使用工具, 可以在主页中简单预览工具的介绍.",
+    "菜单栏的搜索按钮可以搜索工具内容,不过目前工具并不多, 所以可能并不需要.",
+    "在右下角, 有一个悬浮按钮, 直接点击它,打开一个黄页面板, 里面有一些我整理的实用的网站.",
+    "你可能注意到了, 鼠标悬浮在刚刚说的悬浮按钮, 会弹出三个额外的按钮.",
+    "分别是 `关于` `自定义主题色` 和 `暗色模式` .",
+    "主题色的定制只用设置亮色模式下的颜色即可, 暗色模式的背景色根据算法自动生成.",
+];
+if (window.isFirst) {
+    HelpText.push("那么, 祝您生活愉快!");
+}
+const HelpContent: ArgsProps = {
+    key: __NOTIFICATION_KEY__,
+    message: (
+        <>
+            <Typography.Title level={5}>欢迎使用</Typography.Title>
+            {window.isFirst && (
+                <>
+                    <Typography.Paragraph type="secondary">
+                        似乎您第一次使用本工具, 可以查看下面的简单介绍.
+                    </Typography.Paragraph>
+                    <Typography.Paragraph type="secondary">
+                        可以在右下角悬浮按钮中的帮助按钮再次打开此面板
+                    </Typography.Paragraph>
+                </>
+            )}
+            <Typography.Paragraph type="secondary">
+                鼠标悬浮此处保持打开
+            </Typography.Paragraph>
+        </>
+    ),
+    description: (
+        <>
+            <Divider />
+            <Paragraphs strings={HelpText} />
+        </>
+    ),
+    showProgress: true,
+    pauseOnHover: true,
+};
+const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
     const {
-        token: { colorBgContainer, borderRadiusLG, marginLG },
+        token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
     const [currentPage, setCurrentPage] = useState<PageName>("nav_Home");
@@ -77,6 +126,12 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
         localStorage.getItem("primaryColor") ?? DEFAULT_PRIMARY_COLOR,
         localStorage.getItem("bgColor") ?? DEFAULT_BG_COLOR,
     ];
+
+    if (window.isFirst) {
+        useEffect(() => {
+            notifyApi.open(HelpContent);
+        }, []);
+    }
 
     useEffect(() => {
         if (searchRef.current) {
@@ -92,7 +147,7 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
             case "nav_DiceTool":
                 return <TDiceTool.component />;
             case "nav_RandomGenerator":
-                return <TRandomGenerator.component />;
+                return <TRandomGenerator.component notifyApi={notifyApi} />;
             case "nav_QRGenerator":
                 return (
                     <TQRGenerator.component
@@ -116,6 +171,24 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
         key /* keyPath, domEvent */,
     }) => {
         setCurrentPage(key as PageName);
+    };
+    const handleOpenAbout = () => {
+        notifyApi.open({
+            key: __NOTIFICATION_KEY__,
+            message: "关于",
+            description: (
+                <Flex gap={10} vertical align="center">
+                    Version: {__APP_VERSION__}
+                    <div>{aboutText}</div>
+                    <Typography.Link href={__REPOSITORY__}>
+                        {" "}
+                        REPOSITORY{" "}
+                    </Typography.Link>
+                </Flex>
+            ),
+            showProgress: true,
+            pauseOnHover: true,
+        });
     };
     return (
         <Layout style={{ minHeight: "100vh" }}>
@@ -225,18 +298,30 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
                         {GetPage(currentPage)}
                     </div>
                 </Content>
-                <Footer style={{ textAlign: "center" }}>
-                    TeachingTool ©{new Date().getFullYear()} Created by Iceriny
-                </Footer>
+                <Footer style={{ textAlign: "center" }}>{aboutText}</Footer>
             </Layout>
             <FloatButton.Group
                 trigger="hover"
                 type="primary"
                 icon={YellowPageIcon}
                 closeIcon={YellowPageIcon}
-                tooltip={<div>工具黄页</div>}
+                tooltip="工具黄页"
                 onClick={() => setIsOpenYellowPage(true)}
             >
+                <FloatButton
+                    icon={<InfoOutlined />}
+                    tooltip="关于"
+                    onClick={() => {
+                        handleOpenAbout();
+                    }}
+                />
+                <FloatButton
+                    icon={<QuestionOutlined />}
+                    tooltip="帮助"
+                    onClick={() => {
+                        notifyApi.open(HelpContent);
+                    }}
+                />
                 <Popconfirm
                     placement="right"
                     title="定制主题色"
@@ -291,17 +376,15 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
                     showCancel={false}
                 >
                     <FloatButton
-                        style={{ insetInlineEnd: marginLG * 3 }}
                         type="default"
                         icon={<BgColorsOutlined />}
-                        tooltip={<div>定制颜色</div>}
+                        tooltip="定制颜色"
                     />
                 </Popconfirm>
                 <FloatButton
-                    style={{ insetInlineEnd: marginLG * 3 }}
                     type={isDark ? "primary" : "default"}
                     icon={<MoonOutlined />}
-                    tooltip={<div>暗黑模式</div>}
+                    tooltip="暗黑模式"
                     onClick={() => {
                         themeChange();
                         setIsDark(!isDark);

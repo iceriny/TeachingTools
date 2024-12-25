@@ -1,8 +1,11 @@
 {
     "name": "teaching-tools",
     "private": true,
-    "version": "0.6.6",
+    "version": "0.6.10",
     "type": "module",
+    "repository": {
+        "url": "https://github.com/iceriny/TeachingTools"
+    },
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",

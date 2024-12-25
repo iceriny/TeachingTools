@@ -4,6 +4,8 @@ import {
     CaretRightFilled,
     DeleteOutlined,
     HourglassOutlined,
+    QuestionCircleOutlined,
+    QuestionOutlined,
 } from "@ant-design/icons";
 import type { DatePickerProps } from "antd";
 import {
@@ -11,6 +13,7 @@ import {
     DatePicker,
     Flex,
     List,
+    Popconfirm,
     Statistic,
     theme,
     Typography,
@@ -42,6 +45,20 @@ const TimeCountdown: FC = () => {
             <Typography.Title level={4}>
                 <HourglassOutlined style={{ marginRight: "0.5rem" }} />
                 倒计时
+                <Popconfirm
+                    title="Help"
+                    icon={<QuestionCircleOutlined />}
+                    description={() => (
+                        <>
+                            <p>选择时间后点击 ▶️ 即可开始倒计时</p>
+                            <p>可以有多个倒计时队列</p>
+                            <p>垃圾桶按钮清空倒计时</p>
+                        </>
+                    )}
+                    showCancel={false}
+                >
+                    <Button type="link" icon={<QuestionOutlined />} />
+                </Popconfirm>
             </Typography.Title>
             {times.length > 0 && (
                 <List

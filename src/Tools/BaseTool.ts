@@ -97,7 +97,7 @@ class Tool<C extends React.FC<P>, P = {}> {
     protected _iconName: ToolIconName;
     protected enabled: boolean;
     protected constructor(
-        comonent: C,
+        component: C,
         label: ToolsLabel,
         name: ToolName,
         iconName: ToolIconName,
@@ -107,7 +107,7 @@ class Tool<C extends React.FC<P>, P = {}> {
         this._iconName = iconName;
         this.enabled = enabled;
         this.name = name;
-        this.component = comonent;
+        this.component = component;
     }
 }
 

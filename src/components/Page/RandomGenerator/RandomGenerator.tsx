@@ -9,7 +9,6 @@ import {
     Divider,
     Dropdown,
     InputNumber,
-    notification,
     Space,
     Statistic,
     Typography,
@@ -21,6 +20,7 @@ import { useState } from "react";
 
 import { valueType } from "antd/es/statistic/utils";
 import TRandomGenerator from "../../../Tools/TRandomGenerator";
+import { NotificationInstance } from "antd/es/notification/interface";
 
 type randomType =
     | "int"
@@ -139,8 +139,10 @@ const MyStatistic: React.FC<StatisticProps> = (props: StatisticProps) => {
         />
     );
 };
-
-const RandomGenerator: React.FC = () => {
+export interface RandomGeneratorProps {
+    notifyApi: NotificationInstance;
+}
+const RandomGenerator: React.FC<RandomGeneratorProps> = ({ notifyApi }) => {
     const [randomData, setRandomData] = useState<RandomInputData>({
         type: "int",
         min: 0,
@@ -149,9 +151,9 @@ const RandomGenerator: React.FC = () => {
         precision: 2,
     });
     const [randomResults, setRandomResults] = useState<RandomResult[]>([]);
-    const [notifyApi, contextHolder] = notification.useNotification();
     const openNotification = () => {
         notifyApi.open({
+            key: __NOTIFICATION_KEY__,
             message: (
                 <>
                     <Typography.Title level={5}>
@@ -210,7 +212,6 @@ const RandomGenerator: React.FC = () => {
     };
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
-            {contextHolder}
             <Typography.Title level={5}>通用随机生成器</Typography.Title>
             <Space size={40} wrap>
                 <InputNumber

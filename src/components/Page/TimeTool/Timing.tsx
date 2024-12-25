@@ -1,9 +1,11 @@
-import { Button, Flex, List, Typography, theme } from "antd";
+import { Button, Flex, List, Popconfirm, Typography, theme } from "antd";
 import {
     CaretRightOutlined,
     DeleteOutlined,
     FieldTimeOutlined,
     PauseOutlined,
+    QuestionCircleOutlined,
+    QuestionOutlined,
     RedoOutlined,
     UnorderedListOutlined,
     XFilled,
@@ -185,6 +187,24 @@ const Timing: FC<TimingProps> = ({ size = 1 }) => {
             <Typography.Title level={4}>
                 <FieldTimeOutlined style={{ marginRight: "0.5rem" }} />
                 计时器
+                <Popconfirm
+                    title="Help"
+                    icon={<QuestionCircleOutlined />}
+                    description={() => (
+                        <>
+                            <p>点击开始按钮开始计时</p>
+                            <p>
+                                点击停止, 终止计时, 但保留所有结果,
+                                再次点击开始则从0开始计时.
+                            </p>
+                            <p>记录按钮可以记录当前时刻.</p>
+                            <p>垃圾桶按钮清空记录</p>
+                        </>
+                    )}
+                    showCancel={false}
+                >
+                    <Button type="link" icon={<QuestionOutlined />} />
+                </Popconfirm>
             </Typography.Title>
             <TimeDisplay
                 {...timePoint}

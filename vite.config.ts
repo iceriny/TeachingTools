@@ -14,6 +14,8 @@ export default defineConfig({
     plugins: [react(), svgr({ svgrOptions: { icon: true } })],
     define: {
         __APP_VERSION__: `"${appVersion}"`,
+        __NOTIFICATION_KEY__: '"NOTIFICATION"',
+        __REPOSITORY__: `"${packageJson.repository.url}"`,
     },
     // build: {
     //     rollupOptions: {

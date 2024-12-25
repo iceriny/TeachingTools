@@ -10,6 +10,7 @@ import {
     InputNumber,
     message,
     Modal,
+    Popconfirm,
     QRCode,
     Radio,
     Slider,
@@ -17,6 +18,7 @@ import {
     Tooltip,
     Typography,
 } from "antd";
+import { QuestionCircleOutlined, QuestionOutlined } from "@ant-design/icons";
 import InputFile from "../../InputFile";
 import QRParse from "./QRParse";
 
@@ -161,7 +163,56 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
         >
             {contextHolder}
             <Space direction="vertical" size={30} align="center">
-                <Typography.Title level={3}>{Tool.label}</Typography.Title>
+                <Typography.Title level={3}>
+                    {Tool.label}{" "}
+                    <Popconfirm
+                        title="Help"
+                        icon={<QuestionCircleOutlined />}
+                        description={() => (
+                            <>
+                                <p>二维码生成器用于文本或链接生成二维码.</p>
+                                <p>
+                                    底部的 解析二维码
+                                    按钮用于将第三方二维码或本工具生成的二维码解析为文本.
+                                </p>
+                                <p>
+                                    矢量 / 点阵
+                                    两个按钮用于切换二维码的生成模式.
+                                </p>
+                                <p>
+                                    矢量模式使用 SVG, 可以无限放大的格式,
+                                    点阵模式则是 PNG 格式, 不能无限放大但更通用.
+                                </p>
+                                <p>
+                                    矢量 / 点阵 按钮后的色块,
+                                    可以自定义二维码的颜色.
+                                </p>
+                                <p>下载按钮则将生成的二维码下载.</p>
+                                <p>
+                                    容错率代表二维码的纠错能力,
+                                    越高则越能在损坏或覆污的环境下被识别.
+                                </p>
+                                <p>可以拖动手柄查看具体容错率介绍</p>
+                                <p>自定义图标可以将图标插入到二维码的中间.</p>
+
+                                <p>
+                                    二维码中的内容则是需要写入到二维码当中的内容.
+                                </p>
+                                <p>
+                                    二维码中的内容可以是文本, 也可以是链接, 链接
+                                    则需要以 http:// 或 https:// 开头.
+                                </p>
+                                <p>
+                                    程序仅在本地进行处理, 所有数据,
+                                    包括自定义图标都不会上传到服务器.
+                                </p>
+                            </>
+                        )}
+                        showCancel={false}
+                    >
+                        <Button type="link" icon={<QuestionOutlined />} />
+                    </Popconfirm>
+                </Typography.Title>
                 <div id="qr-code-display">
                     <QRCode
                         size={qrInfo.size}

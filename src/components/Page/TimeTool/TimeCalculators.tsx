@@ -2,12 +2,15 @@ import {
     CalculatorOutlined,
     MinusOutlined,
     PlusOutlined,
+    QuestionCircleOutlined,
+    QuestionOutlined,
 } from "@ant-design/icons";
 import {
     Button,
     DatePicker,
     Flex,
     InputNumber,
+    Popconfirm,
     Select,
     Tooltip,
     Typography,
@@ -172,6 +175,33 @@ const TimeCalculators: FC = () => {
             <Typography.Title level={4}>
                 <CalculatorOutlined style={{ marginRight: "0.5rem" }} />
                 时间计算器
+                <Popconfirm
+                    title="Help"
+                    icon={<QuestionCircleOutlined />}
+                    description={() => (
+                        <>
+                            <p>这个工具进行时间相关的计算</p>
+                            <p>点击 ➖ 或 ➕ 增加一个计算项</p>
+                            <p>
+                                ➖➕ 按钮中间的下拉菜单控制添加什么类型的计算项.
+                            </p>
+                            <p>从第二个计算项开始, 计算项前可选 + -</p>
+                            <p>
+                                时间点只允许第一项添加,
+                                且计算项中只允许最多有两个时间点项.
+                            </p>
+                            <p>时间点与时间点的计算, 只允许减法.</p>
+                            <p>时间点与时间段进行计算结果代表某个时间点</p>
+                            <p>
+                                时间点与时间点进行计算 或 时间段与时间段,
+                                结果代表一段时间
+                            </p>
+                        </>
+                    )}
+                    showCancel={false}
+                >
+                    <Button type="link" icon={<QuestionOutlined />} />
+                </Popconfirm>
             </Typography.Title>
             <Flex gap={20} vertical align="start">
                 {items.map((item, index) => {

@@ -1,7 +1,11 @@
 import Tool from "../BaseTool";
 import RandomGenerator from "../../components/Page/RandomGenerator";
+import type { RandomGeneratorProps } from "../../components/Page/RandomGenerator/RandomGenerator";
 
-class TRandomGenerator extends Tool<typeof RandomGenerator> {
+class TRandomGenerator extends Tool<
+    typeof RandomGenerator,
+    RandomGeneratorProps
+> {
     constructor() {
         super(
             RandomGenerator,
