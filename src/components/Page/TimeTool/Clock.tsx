@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import TTimeTool from "../../../Tools/TTimeTool";
 import type { TimeObj } from "../../../Tools/TTimeTool";
 import TimeDisplay, { type TimeDisplayProps } from "./TimeDisplay";
-
+import { breakpointComparative, useBreakpoint } from "../../Utilities";
 const getTime: () => TimeObj = () => {
     const time = TTimeTool.time;
     return {
@@ -20,6 +20,7 @@ interface ClockProps {
 }
 const Clock: FC<ClockProps> = (props: ClockProps) => {
     const [currentTime, setCurrentTime] = useState(getTime());
+    const screens = useBreakpoint();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -29,7 +30,18 @@ const Clock: FC<ClockProps> = (props: ClockProps) => {
         return () => clearInterval(interval);
     }, []);
 
-    return <TimeDisplay {...currentTime} {...props} />;
+    return (
+        <TimeDisplay
+            {...currentTime}
+            {...props}
+            vertical={!breakpointComparative(screens, "lg")}
+            showUnit={
+                breakpointComparative(screens, "lg")
+                    ? [true, true, true, true]
+                    : [false, false, false, false]
+            }
+        />
+    );
 };
 
 export default Clock;

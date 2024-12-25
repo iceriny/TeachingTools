@@ -28,10 +28,6 @@ import Tool, { ToolName } from "../../Tools/BaseTool";
 
 // 菜单显示顺序依赖于 Tool.getAllTools()
 // 导入顺序即为菜单显示顺序
-// import DiceTool from "../Page/DiceTool";
-// import ExecuteDemonstrator from "../Page/ExecuteDemonstrator";
-// import RandomGenerator from "../Page/RandomGenerator";
-// import QRGenerator from "../Page/QRGenerator";
 import TDiceTool from "../../Tools/TDiceTool";
 import TExecuteDemonstrator from "../../Tools/TExecuteDemonstrator";
 import TRandomGenerator from "../../Tools/TRandomGenerator";
@@ -43,7 +39,13 @@ import TTimeTool from "../../Tools/TTimeTool";
 import Home from "../Page/Home";
 import YellowPage from "./YellowPage";
 import Clock from "../Page/TimeTool/Clock";
-import { DEFAULT_BG_COLOR, DEFAULT_PRIMARY_COLOR } from "../Utilities";
+import {
+    useBreakpoint,
+    breakpointComparative,
+    DEFAULT_BG_COLOR,
+    DEFAULT_PRIMARY_COLOR,
+    getValueFromBreakpoint,
+} from "../Utilities";
 import type { NotificationInstance } from "antd/es/notification/interface";
 import Paragraphs from "../Paragraphs";
 import { ArgsProps } from "antd/es/notification";
@@ -110,7 +112,13 @@ const HelpContent: ArgsProps = {
     showProgress: true,
     pauseOnHover: true,
 };
+
+/**
+ * 主页面组件
+ * @param param0 消息API, 主题切换F, 主题色修改F
+ */
 const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
+    const screens = useBreakpoint();
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
@@ -126,13 +134,11 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
         localStorage.getItem("primaryColor") ?? DEFAULT_PRIMARY_COLOR,
         localStorage.getItem("bgColor") ?? DEFAULT_BG_COLOR,
     ];
-
     if (window.isFirst) {
         useEffect(() => {
             notifyApi.open(HelpContent);
         }, []);
     }
-
     useEffect(() => {
         if (searchRef.current) {
             searchRef.current.focus({ cursor: "all" });
@@ -190,11 +196,14 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
             pauseOnHover: true,
         });
     };
+    const screenIsGreaterMd = breakpointComparative(screens, "md");
+    const siderCollapsedWidth = breakpointComparative(screens, "sm") ? 80 : 40;
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <Sider
                 theme="light"
                 breakpoint="lg"
+                collapsedWidth={siderCollapsedWidth}
                 // onBreakpoint={(broken) => {
                 //     console.log(broken);
                 // }}
@@ -217,13 +226,14 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
                         <Divider style={{ margin: "8px 0 8px 0" }} />
                     </div>
                 )}
-                <Flex gap={10}>
+                <Flex gap={10} vertical={!screenIsGreaterMd}>
                     <Input
                         ref={searchRef}
                         placeholder="搜索"
                         addonBefore={<SearchOutlined />}
                         style={{
                             width: "100%",
+                            minWidth: "10rem",
                             display: searchPrepare ? "block" : "none",
                         }}
                         onBlur={(event) => {
@@ -249,7 +259,12 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
                     <Button
                         style={{
                             display: searchPrepare ? "none" : undefined,
-                            width: currentPage === "nav_Home" ? "100%" : "25%",
+                            width:
+                                currentPage === "nav_Home"
+                                    ? "100%"
+                                    : !screenIsGreaterMd
+                                    ? "100%"
+                                    : "25%",
                         }}
                         type={currentPage === "nav_Home" ? "text" : undefined}
                         icon={<SearchOutlined />}
@@ -399,7 +414,21 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
                 }}
                 title="工具黄页"
                 placement="right"
-                width={"30%"}
+                width={
+                    screenIsGreaterMd
+                        ? getValueFromBreakpoint(
+                              {
+                                  xxl: "30%",
+                                  xl: "40%",
+                                  lg: "50%",
+                                  md: "60%",
+                                  sm: "70%",
+                                  xs: "80%",
+                              },
+                              screens
+                          )
+                        : `calc(100% - ${siderCollapsedWidth}px)`
+                }
             >
                 <YellowPage />
             </Drawer>

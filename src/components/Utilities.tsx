@@ -1,5 +1,10 @@
+import type { Breakpoint } from "antd";
+import { Grid } from "antd";
 import { useEffect, useRef } from "react";
 
+const { useBreakpoint: useAntdBreakpoint } = Grid;
+
+type BreakpointTypes = Partial<Record<Breakpoint, boolean>>;
 function useLastStage<T>(value: T) {
     const ref = useRef<T>(value);
     useEffect(() => {
@@ -7,6 +12,12 @@ function useLastStage<T>(value: T) {
     }, [value]);
     return ref.current;
 }
+
+function useBreakpoint() {
+    const screens = useAntdBreakpoint();
+    return screens;
+}
+
 // 类型定义
 type RGB = { r: number; g: number; b: number };
 type HSL = { h: number; s: number; l: number };
@@ -137,12 +148,60 @@ function getDarkBgColor(lightBgColor: string) {
 
     return rgbToHex(adjustedRgb);
 }
+
 const DEFAULT_PRIMARY_COLOR = "#a66595";
 const DEFAULT_BG_COLOR = "#ffffff";
+
+const BREAK_POINT_LIST = ["xxl", "xl", "lg", "md", "sm", "xs"] as const;
+
+function getCurrentBreakpoint(breakpoints: BreakpointTypes) {
+    for (const breakpoint of BREAK_POINT_LIST) {
+        if (breakpoints[breakpoint]) {
+            return breakpoint;
+        }
+    }
+    return "xs";
+}
+function breakpointComparative(
+    breakpoints: BreakpointTypes,
+    value: Breakpoint
+) {
+    if (breakpoints[value]) return true;
+    return false;
+}
+function getValueFromBreakpoint<T extends Record<Breakpoint, unknown>>(
+    values: T,
+    breakpoints: BreakpointTypes,
+    defaultValue?: T[keyof T]
+): T[keyof T];
+
+function getValueFromBreakpoint<T extends Record<Breakpoint, unknown>>(
+    values: T,
+    breakpoint: Breakpoint,
+    defaultValue?: T[keyof T]
+): T[keyof T];
+
+function getValueFromBreakpoint<T extends Record<Breakpoint, unknown>>(
+    values: T,
+    breakpoints: BreakpointTypes | Breakpoint,
+    defaultValue?: T[keyof T]
+) {
+    if (typeof breakpoints === "string") {
+        return values[breakpoints] ?? defaultValue ?? values.md;
+    } else {
+        const currentBreakpoint = getCurrentBreakpoint(breakpoints);
+        return values[currentBreakpoint] ?? defaultValue ?? values.md;
+    }
+}
+
 export {
     useLastStage,
+    useBreakpoint,
     adjustColor,
     getDarkBgColor,
+    getCurrentBreakpoint,
+    breakpointComparative,
+    getValueFromBreakpoint,
     DEFAULT_PRIMARY_COLOR,
     DEFAULT_BG_COLOR,
 };

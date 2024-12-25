@@ -5,20 +5,23 @@ import Clock from "./Clock";
 import TimeCountdown from "./Countdown";
 import Timing from "./Timing";
 import TimeCalculators from "./TimeCalculators";
+import { breakpointComparative, useBreakpoint } from "../../Utilities";
 
 function TimeTool() {
+    const screens = useBreakpoint();
+
     return (
         <div>
             <Clock />
             <Divider />
             <Row gutter={[16, 32]}>
-                <Col span={12}>
+                <Col span={breakpointComparative(screens, "md") ? 8 : 24}>
                     <Timing />
                 </Col>
-                <Col span={12}>
+                <Col span={breakpointComparative(screens, "md") ? 8 : 24}>
                     <TimeCountdown />
                 </Col>
-                <Col span={24}>
+                <Col span={breakpointComparative(screens, "md") ? 8 : 24}>
                     <TimeCalculators />
                 </Col>
             </Row>

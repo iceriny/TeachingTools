@@ -21,6 +21,11 @@ import {
 import { QuestionCircleOutlined, QuestionOutlined } from "@ant-design/icons";
 import InputFile from "../../InputFile";
 import QRParse from "./QRParse";
+import {
+    breakpointComparative,
+    getValueFromBreakpoint,
+    useBreakpoint,
+} from "../../Utilities";
 
 function doDownload(url: string, fileName: string) {
     const a = document.createElement("a");
@@ -119,6 +124,7 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
         size: window.innerWidth / 5,
     });
     const [isParseQROpen, setIsParseQROpen] = useState(false);
+    const screens = useBreakpoint();
 
     useEffect(() => {
         const handleResize = () => {
@@ -246,7 +252,17 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                     <Typography.Text>容错率</Typography.Text>
                     <Slider
                         style={{
-                            width: "500px",
+                            width: getValueFromBreakpoint(
+                                {
+                                    xxl: "700px",
+                                    xl: "600px",
+                                    lg: "500px",
+                                    md: "400px",
+                                    sm: "300px",
+                                    xs: "200px",
+                                },
+                                screens
+                            ),
                         }}
                         marks={{ 0: "低", 33: "中", 66: "较高", 100: "高" }}
                         step={null}
@@ -281,7 +297,15 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                         />
                     )}
                 </Space>
-                <Space>
+                <Space
+                    direction={
+                        breakpointComparative(screens, "lg")
+                            ? undefined
+                            : "vertical"
+                    }
+                    align="center"
+                    size={"large"}
+                >
                     <Input
                         placeholder="请输入内容"
                         allowClear

@@ -22,6 +22,7 @@ import React, { SyntheticEvent, useState, Suspense } from "react";
 const SyntaxHighlighter = React.lazy(() => import("react-syntax-highlighter"));
 
 import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
+import { breakpointComparative, useBreakpoint } from "../../Utilities";
 
 const { useToken } = theme;
 
@@ -87,6 +88,7 @@ const ExecuteDemonstrator: React.FC = () => {
     // const [codeSteps, setCodeSteps] = useState<number[]>([]);
     const [currentLine, setCurrentLine] = useState<number>(0);
     const [langType, setLangType] = useState<keyof typeof langTypeLabel>("cpp");
+    const screens = useBreakpoint();
 
     const handleCodeChange: (event: SyntheticEvent) => void = (event) => {
         if (!event) return;
@@ -350,6 +352,11 @@ const ExecuteDemonstrator: React.FC = () => {
                 style={{ display: "flex" }}
             >
                 <Splitter
+                    layout={
+                        breakpointComparative(screens, "md")
+                            ? "horizontal"
+                            : "vertical"
+                    }
                     style={{
                         minHeight: "150px",
                         boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",

@@ -263,7 +263,11 @@ const TimeCalculators: FC = () => {
                 >
                     =
                 </Typography.Text>
-                <TimeDisplay {...TTimeTool.getTimeObj(result)} size={2} />
+                <TimeDisplay
+                    {...TTimeTool.getTimeObj(result)}
+                    size={2}
+                    showUnit={[true, true, true, true]}
+                />
             </Flex>
         </Flex>
     );
