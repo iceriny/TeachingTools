@@ -122,12 +122,12 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
             <Sider
                 theme="light"
                 breakpoint="lg"
-                onBreakpoint={(broken) => {
-                    console.log(broken);
-                }}
-                onCollapse={(collapsed, type) => {
-                    console.log(collapsed, type);
-                }}
+                // onBreakpoint={(broken) => {
+                //     console.log(broken);
+                // }}
+                // onCollapse={(collapsed, type) => {
+                //     console.log(collapsed, type);
+                // }}
                 style={{ padding: "5px" }}
             >
                 {currentPage !== "nav_TimeTool" && (
@@ -240,6 +240,7 @@ const Main: React.FC<MainProps> = ({ themeChange, colorChange }) => {
                 <Popconfirm
                     placement="right"
                     title="定制主题色"
+                    icon={<BgColorsOutlined />}
                     description={
                         <Flex gap={10} vertical style={{ margin: "20px" }}>
                             <Flex gap={50} align="end">

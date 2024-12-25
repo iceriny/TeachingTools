@@ -1,5 +1,5 @@
 import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
+import dayjs, { isDayjs } from "dayjs";
 // import * as isLeapYear from "dayjs/plugin/isLeapYear"; // 导入插件
 import "dayjs/locale/zh-cn"; // 导入本地化语言
 
@@ -7,8 +7,10 @@ import TimeTool from "../../components/Page/TimeTool";
 import Tool from "../BaseTool";
 
 import type { Duration } from "dayjs/plugin/duration";
+import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import duration from "dayjs/plugin/duration";
 dayjs.extend(duration); // 使用插件
+dayjs.extend(quarterOfYear);
 dayjs.locale("zh-cn"); // 使用本地化语言
 
 type CalType = "point" | "range";
@@ -26,6 +28,15 @@ const RangeLabel = {
 
 type RangeLabelType = typeof RangeLabel;
 type RangeType = keyof RangeLabelType;
+
+export interface TimeObj {
+    y: number;
+    m: number;
+    d: number;
+    h: number;
+    i: number;
+    s: number;
+}
 
 interface Timing {
     t: number;
@@ -112,15 +123,17 @@ class TTimeTool extends Tool<typeof TimeTool> {
         this.timingTimes.delete(key);
         return result;
     }
-    static readonly TIME_UNITS_IN_MS: Record<RangeType, number> = {
+    static readonly TIME_UNITS_IN_MS: Record<
+        Exclude<RangeType, "quarter">,
+        number
+    > = {
         second: 1000,
         minute: 60000,
         hour: 3600000,
         day: 86400000,
         week: 604800000,
         month: 2592000000, // Approximation: 30 days
-        quarter: 7776000000, // Approximation: 3 months
-        year: 31536000000, // Approximation: 365 days
+        year: 220752000000, // Approximation: 365 days
     };
 
     /**
@@ -132,7 +145,15 @@ class TTimeTool extends Tool<typeof TimeTool> {
      */
     conversion(value: number, type: RangeType, targetType: RangeType): number {
         if (value === 0) return 0;
-
+        if (type === targetType) return value;
+        if (type === "quarter") {
+            value = value * 3;
+            type = "month";
+        }
+        if (targetType === "quarter") {
+            value = this.conversion(value, type, "month");
+            return value * 3;
+        }
         const sourceFactor = TTimeTool.TIME_UNITS_IN_MS[type];
         const targetFactor = TTimeTool.TIME_UNITS_IN_MS[targetType];
 
@@ -160,28 +181,38 @@ class TTimeTool extends Tool<typeof TimeTool> {
         }[]
     ) {
         if (args.length === 0) return dayjs.duration(0);
-        if (isPointTime(args[0].value)) {
+
+        let firstValue = args[0].value;
+        let firstValueType = args[0].rangeType;
+
+        if (isPointTime(firstValue)) {
             return args.reduce<dayjs.Dayjs | Duration>((prev, cur, index) => {
                 if (index === 0) return prev;
 
-                if (isPointTime(cur.value)) {
+                let curValue = cur.value;
+                let curValueType = cur.rangeType;
+
+                if (isPointTime(curValue)) {
                     prev = prev as dayjs.Dayjs;
-                    return dayjs.duration(
-                        prev.valueOf() - cur.value.valueOf(),
-                        "ms"
-                    );
+                    return dayjs.duration(prev.diff(curValue));
                 } else {
-                    let curValue = cur.value;
-                    if (cur.rangeType === "quarter")
+                    if (curValueType === "quarter") {
                         curValue = this.conversion(
                             curValue,
-                            cur.rangeType,
-                            "day"
+                            curValueType,
+                            "month"
                         );
-                    const theDuration = dayjs.duration(
-                        cur.value,
-                        cur.rangeType === "quarter" ? "day" : cur.rangeType
-                    );
+                        curValueType = "month";
+                    }
+                    if (isDayjs(prev)) {
+                        switch (cur.symbol) {
+                            case "+":
+                                return prev.add(curValue, curValueType);
+                            case "-":
+                                return prev.subtract(curValue, curValueType);
+                        }
+                    }
+                    const theDuration = dayjs.duration(curValue, curValueType);
                     switch (cur.symbol) {
                         case "+":
                             return prev.add(theDuration);
@@ -189,35 +220,55 @@ class TTimeTool extends Tool<typeof TimeTool> {
                             return prev.subtract(theDuration);
                     }
                 }
-            }, args[0].value);
+            }, firstValue);
+        } else {
+            if (firstValueType === "quarter") {
+                firstValue = firstValue * 3;
+                firstValueType = "month";
+            }
         }
 
-        let firstValue = args[0].value;
-        if (args[0].rangeType === "quarter")
-            firstValue = this.conversion(firstValue, args[0].rangeType, "day");
-
-        return args.reduce((prev, cur, index) => {
+        const result = args.reduce((prev, cur, index) => {
             if (index === 0) return prev;
 
-            let curValue = cur.value;
-            if (cur.rangeType === "quarter")
-                curValue = this.conversion(
-                    curValue as number,
-                    cur.rangeType,
-                    "day"
-                );
+            let curValue = cur.value as number;
+            let curValueType = cur.rangeType;
 
-            const theDuration = dayjs.duration(
-                cur.value as number,
-                cur.rangeType === "quarter" ? "day" : cur.rangeType
-            );
+            if (curValueType === "quarter") {
+                curValue *= 3;
+                curValueType = "month";
+            }
+
+            const theDuration = dayjs.duration(curValue, curValueType);
             switch (cur.symbol) {
                 case "+":
                     return prev.add(theDuration);
                 case "-":
                     return prev.subtract(theDuration);
             }
-        }, dayjs.duration(firstValue));
+        }, dayjs.duration(firstValue, firstValueType as Exclude<RangeType, "quarter">));
+        return result;
+    }
+    getTimeObj(time: Dayjs | Duration) {
+        if (isDayjs(time)) {
+            return {
+                y: time.year(),
+                m: time.month() + 1,
+                d: time.date(),
+                h: time.hour(),
+                i: time.minute(),
+                s: time.second(),
+            };
+        } else {
+            return {
+                y: time.years(),
+                m: time.months(),
+                d: time.days(),
+                h: time.hours(),
+                i: time.minutes(),
+                s: time.seconds(),
+            };
+        }
     }
 }
 

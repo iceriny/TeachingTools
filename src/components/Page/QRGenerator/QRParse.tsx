@@ -117,7 +117,6 @@ const QRParse: React.FC<Props> = ({ onChange }: Props) => {
                                     { inversionAttempts: "attemptBoth" }
                                 );
                             }
-                            console.log(qrData);
                             const result =
                                 qrData?.data || "[二维码解析内容为空]";
                             inputRef.current &&

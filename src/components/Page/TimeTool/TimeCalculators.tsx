@@ -38,7 +38,7 @@ interface TimeItemProps {
 const TimeItem: FC<TimeItemProps> = ({
     value,
     symbol,
-    rangeType = "day",
+    rangeType,
     isFirst = false,
     onlySubtraction = false,
     onChange,
@@ -68,7 +68,7 @@ const TimeItem: FC<TimeItemProps> = ({
                         onChange?.(date, index);
                     }}
                     showTime
-                    defaultValue={dayjs(value)}
+                    defaultValue={value}
                 />
             ) : (
                 <>
@@ -86,7 +86,7 @@ const TimeItem: FC<TimeItemProps> = ({
                             alignContent: "center",
                         }}
                     >
-                        {RangeLabel[rangeType]}
+                        {RangeLabel[rangeType!]}
                     </Typography.Text>
                 </>
             )}
@@ -99,10 +99,9 @@ const TimeCalculators: FC = () => {
     const lastItems = useRef<TimeItemProps[]>(items);
     const addedItemType = useRef<ItemType>("point");
     const [result, setResult] = useState<Duration | Dayjs>(dayjs.duration(0));
-
     useEffect(() => {
         lastItems.current = items;
-        const result: Duration | Dayjs = TTimeTool.calculate(
+        const calResult: Duration | Dayjs = TTimeTool.calculate(
             items.map((item) => {
                 return {
                     value: item.value,
@@ -111,7 +110,7 @@ const TimeCalculators: FC = () => {
                 };
             })
         );
-        setResult(result);
+        setResult(calResult);
     }, [items]);
     const isSecondlyPoint = useCallback(
         (curType: CalType, items: TimeItemProps[]) => {
@@ -157,7 +156,6 @@ const TimeCalculators: FC = () => {
         Exclude<TimeItemProps["onChange"], undefined>
     >(
         (value, index) => {
-            console.log("value: ", value, "index: ", index);
             const newItems = [...lastItems.current];
             if (typeof value === "string") {
                 newItems[index].symbol = value;
@@ -175,7 +173,7 @@ const TimeCalculators: FC = () => {
                 <CalculatorOutlined style={{ marginRight: "0.5rem" }} />
                 时间计算器
             </Typography.Title>
-            <Flex gap={20} vertical>
+            <Flex gap={20} vertical align="start">
                 {items.map((item, index) => {
                     return <TimeItem {...item} key={index} />;
                 })}
@@ -235,15 +233,7 @@ const TimeCalculators: FC = () => {
                 >
                     =
                 </Typography.Text>
-                <TimeDisplay
-                    y={result.get("y")}
-                    m={result.get("month")}
-                    d={result.get("d")}
-                    h={result.get("h")}
-                    i={result.get("minute")}
-                    s={result.get("s")}
-                    size={2}
-                />
+                <TimeDisplay {...TTimeTool.getTimeObj(result)} size={2} />
             </Flex>
         </Flex>
     );

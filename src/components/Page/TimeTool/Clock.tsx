@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
 import TTimeTool from "../../../Tools/TTimeTool";
+import type { TimeObj } from "../../../Tools/TTimeTool";
 import TimeDisplay, { type TimeDisplayProps } from "./TimeDisplay";
 
-interface TimeObj extends TimeDisplayProps {}
 const getTime: () => TimeObj = () => {
     const time = TTimeTool.time;
     return {

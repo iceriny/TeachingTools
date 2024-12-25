@@ -42,7 +42,7 @@ function LinkItem({ label, icon, link, description, tags }: ItemProps) {
             >
                 {icon}
                 {label}
-                <Space size={1}>
+                <Space size={8} wrap>
                     {tags?.map((tag, index) => (
                         <Tag
                             key={index}

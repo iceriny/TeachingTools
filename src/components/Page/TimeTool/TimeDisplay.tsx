@@ -1,17 +1,12 @@
 import { FC } from "react";
 import { Typography, theme } from "antd";
+import type { TimeObj } from "../../../Tools/TTimeTool";
 
 const { useToken } = theme;
 
-export interface TimeDisplayProps {
-    y: number;
-    m: number;
-    d: number;
-    h: number;
-    i: number;
-    s: number;
+export interface TimeDisplayProps extends TimeObj {
     size?: 1 | 2 | 3 | 4 | 5;
-    show?: ("y" | "m" | "d" | "h" | "i" | "s")[];
+    show?: (keyof TimeObj)[];
 }
 const SizeMap = [1, 1.5, 1.8, 2.2, 3] as const;
 const FontSizeMap = [0.5, 0.9, 1, 1.2, 1.6];
