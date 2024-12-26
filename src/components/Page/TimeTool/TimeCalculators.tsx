@@ -19,11 +19,11 @@ import {
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 import ButtonGroup from "antd/es/button/button-group";
-import TTimeTool, { RangeLabel, isPointTime } from "../../../Tools/TTimeTool";
-import type { CalSymbol, RangeType, CalType } from "../../../Tools/TTimeTool";
-import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { Duration } from "dayjs/plugin/duration";
+import type { CalSymbol, CalType, RangeType } from "../../../Tools/TTimeTool";
+import TTimeTool, { RangeLabel, isPointTime } from "../../../Tools/TTimeTool";
 import TimeDisplay from "./TimeDisplay";
 
 type ItemType = "point" | `range-${RangeType}`;
@@ -266,7 +266,7 @@ const TimeCalculators: FC = () => {
                 <TimeDisplay
                     {...TTimeTool.getTimeObj(result)}
                     size={2}
-                    showUnit={[true, true, true, true]}
+                    showUnit={[true, true, true]}
                 />
             </Flex>
         </Flex>

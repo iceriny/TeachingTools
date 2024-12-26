@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import TQRGenerator from "../../../Tools/TQRGenerator";
 
+import { QuestionCircleOutlined, QuestionOutlined } from "@ant-design/icons";
 import type { RadioChangeEvent, SliderSingleProps } from "antd";
 import {
     Button,
@@ -18,14 +19,13 @@ import {
     Tooltip,
     Typography,
 } from "antd";
-import { QuestionCircleOutlined, QuestionOutlined } from "@ant-design/icons";
 import InputFile from "../../InputFile";
-import QRParse from "./QRParse";
 import {
     breakpointComparative,
     getValueFromBreakpoint,
     useBreakpoint,
 } from "../../Utilities";
+import QRParse from "./QRParse";
 
 function doDownload(url: string, fileName: string) {
     const a = document.createElement("a");
