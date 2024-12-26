@@ -74,6 +74,7 @@ interface MainProps {
 const YellowPageIcon = <AppstoreOutlined />;
 const HelpText = [
     "本工具是一个多功能工具箱, 包含多种可用的使用工具, 可以在主页中简单预览工具的介绍.",
+    "不同工具的使用方法在对应的组件标题右侧都有帮助按钮,",
     "菜单栏的搜索按钮可以搜索工具内容,不过目前工具并不多, 所以可能并不需要.",
     "在右下角, 有一个悬浮按钮, 直接点击它,打开一个黄页面板, 里面有一些我整理的实用的网站.",
     "你可能注意到了, 鼠标悬浮在刚刚说的悬浮按钮, 会弹出三个额外的按钮.",
@@ -196,7 +197,7 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
             pauseOnHover: true,
         });
     };
-    const screenIsGreaterMd = breakpointComparative(screens, "md");
+    const screenIsGreaterLg = breakpointComparative(screens, "lg");
     const siderCollapsedWidth = breakpointComparative(screens, "sm") ? 80 : 40;
     return (
         <Layout style={{ minHeight: "100vh" }}>
@@ -222,11 +223,17 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
                             width: "100%",
                         }}
                     >
-                        <Clock size={1} show={["h", "i", "s"]} />
+                        <Clock
+                            size={breakpointComparative(screens, "md") ? 2 : 1}
+                            show={["h", "i", "s"]}
+                            showType={
+                                screenIsGreaterLg ? undefined : { s: "circle" }
+                            }
+                        />
                         <Divider style={{ margin: "8px 0 8px 0" }} />
                     </div>
                 )}
-                <Flex gap={10} vertical={!screenIsGreaterMd}>
+                <Flex gap={10} vertical={!screenIsGreaterLg}>
                     <Input
                         ref={searchRef}
                         placeholder="搜索"
@@ -262,7 +269,7 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
                             width:
                                 currentPage === "nav_Home"
                                     ? "100%"
-                                    : !screenIsGreaterMd
+                                    : !screenIsGreaterLg
                                     ? "100%"
                                     : "25%",
                         }}
@@ -415,7 +422,7 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
                 title="工具黄页"
                 placement="right"
                 width={
-                    screenIsGreaterMd
+                    screenIsGreaterLg
                         ? getValueFromBreakpoint(
                               {
                                   xxl: "30%",

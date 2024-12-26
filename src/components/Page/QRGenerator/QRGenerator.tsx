@@ -106,7 +106,6 @@ interface QRInfo {
     content?: string;
     type: "svg" | "canvas";
     color?: string;
-    size: number;
     icon?: QRIcon;
     iconSize?: number;
     level: "L" | "M" | "Q" | "H";
@@ -121,22 +120,10 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
     const [qrInfo, setQRInfo] = useState<QRInfo>({
         type: "svg",
         level: "M",
-        size: window.innerWidth / 5,
     });
     const [isParseQROpen, setIsParseQROpen] = useState(false);
     const screens = useBreakpoint();
 
-    useEffect(() => {
-        const handleResize = () => {
-            setQRInfo({ ...qrInfo, size: window.innerWidth / 5 }); // 更新状态
-        };
-
-        window.addEventListener("resize", handleResize); // 添加监听器
-
-        return () => {
-            window.removeEventListener("resize", handleResize); // 清理监听器
-        };
-    }, []); // 空依赖数组，确保只运行一次
     const onTypeChange = ({ target: { value } }: RadioChangeEvent) => {
         setQRInfo({ ...qrInfo, type: value });
     };
@@ -221,7 +208,17 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                 </Typography.Title>
                 <div id="qr-code-display">
                     <QRCode
-                        size={qrInfo.size}
+                        size={getValueFromBreakpoint(
+                            {
+                                xs: 120,
+                                sm: 120,
+                                md: 150,
+                                lg: 200,
+                                xl: 250,
+                                xxl: 250,
+                            },
+                            screens
+                        )}
                         value={qrInfo.content || "请输入内容"}
                         type={qrInfo.type}
                         color={qrInfo.color}

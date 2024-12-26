@@ -15,13 +15,14 @@ const getTime: () => TimeObj = () => {
     };
 };
 interface ClockProps {
+    showUnit?: TimeDisplayProps["showUnit"];
     size?: TimeDisplayProps["size"];
     show?: TimeDisplayProps["show"];
+    showType?: TimeDisplayProps["showType"];
 }
 const Clock: FC<ClockProps> = (props: ClockProps) => {
     const [currentTime, setCurrentTime] = useState(getTime());
     const screens = useBreakpoint();
-
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTime(getTime());
@@ -35,11 +36,6 @@ const Clock: FC<ClockProps> = (props: ClockProps) => {
             {...currentTime}
             {...props}
             vertical={!breakpointComparative(screens, "lg")}
-            showUnit={
-                breakpointComparative(screens, "lg")
-                    ? [true, true, true, true]
-                    : [false, false, false, false]
-            }
         />
     );
 };

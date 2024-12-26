@@ -208,7 +208,14 @@ const RandomGenerator: React.FC<RandomGeneratorProps> = ({ notifyApi }) => {
     };
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
-            <Typography.Title level={5}>通用随机生成器</Typography.Title>
+            <Typography.Title level={3}>
+                通用随机生成器
+                <Button
+                    type="link"
+                    onClick={openNotification}
+                    icon={<QuestionOutlined />}
+                />
+            </Typography.Title>
             <Space size={40} wrap>
                 <InputNumber
                     changeOnWheel
@@ -289,11 +296,6 @@ const RandomGenerator: React.FC<RandomGeneratorProps> = ({ notifyApi }) => {
                 >
                     生成
                 </Dropdown.Button>
-                <Button
-                    type="link"
-                    onClick={openNotification}
-                    icon={<QuestionOutlined />}
-                />
             </Space>
             <Divider />
             <Space wrap>

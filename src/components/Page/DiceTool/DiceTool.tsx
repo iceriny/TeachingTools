@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, Dropdown, Flex, Space, Popconfirm, message, Button } from "antd";
+import {
+    Card,
+    Dropdown,
+    Flex,
+    Space,
+    Popconfirm,
+    message,
+    Button,
+    Typography,
+} from "antd";
 import { QuestionOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
@@ -89,7 +98,41 @@ const DiceTool: React.FC = () => {
         }
     };
     return (
-        <Flex vertical gap={10} onDoubleClick={HandleCancelSelect}>
+        <Flex
+            vertical
+            gap={10}
+            onDoubleClick={HandleCancelSelect}
+            align="center"
+            justify="center"
+        >
+            <Typography.Title level={3}>
+                {tool.label}{" "}
+                <Popconfirm
+                    title="Help"
+                    icon={<QuestionCircleOutlined />}
+                    description={() => (
+                        <>
+                            <p>点击骰子可以选中, 双击空白位置可以取消选中.</p>
+                            <p>
+                                鼠标悬浮左侧按钮的图标部分, 点击 Sum
+                                可以计算选中骰子的和.
+                            </p>
+                            <p>
+                                鼠标悬浮左侧按钮的图标部分, 点击 Clear Sum
+                                按钮可以清空所有计算结果.
+                            </p>
+                            <p>
+                                鼠标悬浮左侧按钮的图标部分, 点击 Clear
+                                按钮可以清空所有骰子.
+                            </p>
+                            <p>点击 Roll 按钮可以投掷一个骰子.</p>
+                        </>
+                    )}
+                    showCancel={false}
+                >
+                    <Button type="link" icon={<QuestionOutlined />} />
+                </Popconfirm>
+            </Typography.Title>
             {contextHolder}
             <Flex
                 style={{ width: "100%", marginRight: "20px" }}
@@ -159,37 +202,6 @@ const DiceTool: React.FC = () => {
                     >
                         Sum
                     </Dropdown.Button>
-                    <Popconfirm
-                        title="Help"
-                        icon={<QuestionCircleOutlined />}
-                        description={() => (
-                            <>
-                                <p>
-                                    点击骰子可以选中, 双击空白位置可以取消选中.
-                                </p>
-                                <p>
-                                    鼠标悬浮左侧按钮的图标部分, 点击 Sum
-                                    可以计算选中骰子的和.
-                                </p>
-                                <p>
-                                    鼠标悬浮左侧按钮的图标部分, 点击 Clear Sum
-                                    按钮可以清空所有计算结果.
-                                </p>
-                                <p>
-                                    鼠标悬浮左侧按钮的图标部分, 点击 Clear
-                                    按钮可以清空所有骰子.
-                                </p>
-                                <p>点击 Roll 按钮可以投掷一个骰子.</p>
-                            </>
-                        )}
-                        // onConfirm={confirm}
-                        // onCancel={cancel}
-                        showCancel={false}
-                        // okText="Yes"
-                        // cancelText="No"
-                    >
-                        <Button type="link" icon={<QuestionOutlined />} />
-                    </Popconfirm>
                 </Space>
             </Flex>
             <Flex gap="10px" wrap>
