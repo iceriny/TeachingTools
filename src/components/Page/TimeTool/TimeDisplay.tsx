@@ -37,7 +37,7 @@ const DateDisplayItem: FC<DateDisplayItemProps> = ({
 }) => {
     return (
         <div style={{ display: "inline" }}>
-            {value}
+            {`${value}`.padStart(2, "0")}
             {showUnit && (
                 <span
                     style={{

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import TQRGenerator from "../../../Tools/TQRGenerator";
 
@@ -24,6 +24,7 @@ import {
     breakpointComparative,
     getValueFromBreakpoint,
     useBreakpoint,
+    useStore,
 } from "../../Utilities";
 import QRParse from "./QRParse";
 
@@ -55,6 +56,21 @@ const downloadSvgQRCode = () => {
 
     doDownload(url, "QRCode.svg");
 };
+
+export interface QRGeneratorProps {
+    contentMinHeight: number;
+    contentPadding: number;
+}
+type QRIcon = { src: string; name: string };
+interface QRInfo {
+    content?: string;
+    type: "svg" | "canvas";
+    color?: string;
+    icon?: QRIcon;
+    iconSize?: number;
+    level: "L" | "M" | "Q" | "H";
+}
+
 const formatter: NonNullable<SliderSingleProps["tooltip"]>["formatter"] = (
     value
 ) => {
@@ -97,35 +113,32 @@ const formatter: NonNullable<SliderSingleProps["tooltip"]>["formatter"] = (
             </>
         );
 };
-export interface QRGeneratorProps {
-    contentMinHeight: number;
-    contentPadding: number;
-}
-type QRIcon = { src: string; name: string };
-interface QRInfo {
-    content?: string;
-    type: "svg" | "canvas";
-    color?: string;
-    icon?: QRIcon;
-    iconSize?: number;
-    level: "L" | "M" | "Q" | "H";
-}
+
+/**
+ * ## QRGenerator组件
+ * @param param0   contentMinHeight: 主容器最小高度, contentPadding: 主容器内边距,
+ * @returns QRGenerator组件
+ */
 const QRGenerator: React.FC<QRGeneratorProps> = ({
     contentMinHeight,
     contentPadding,
 }) => {
     const Tool = TQRGenerator;
     const [messageApi, contextHolder] = message.useMessage();
+
     const otherQrContentRef = React.useRef<string>();
-    const [qrInfo, setQRInfo] = useState<QRInfo>({
+    const [getQrInfo, saveQrInfo, _] = useStore("QR", {
         type: "svg",
         level: "M",
-    });
+    } as QRInfo);
+    const [qrInfo, setQRInfo] = useState<QRInfo>({ ...getQrInfo() });
+
     const [isParseQROpen, setIsParseQROpen] = useState(false);
     const screens = useBreakpoint();
 
     const onTypeChange = ({ target: { value } }: RadioChangeEvent) => {
         setQRInfo({ ...qrInfo, type: value });
+        saveQrInfo(qrInfo);
     };
     const onClickDownload = () => {
         if (qrInfo.type === "svg") {
@@ -134,15 +147,20 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
             downloadCanvasQRCode();
         }
     };
+    useEffect(() => {
+        setQRInfo({ ...getQrInfo() });
+    }, []);
 
     const handleUploadIcon = (fileName: string, result: string) => {
-        setQRInfo({
+        const info = {
             ...qrInfo,
             icon: {
                 src: result,
                 name: fileName || "未选择",
             },
-        }); // 将图片的Base64 URL存储到状态
+        };
+        setQRInfo(info); // 将图片的Base64 URL存储到状态
+        saveQrInfo(info);
     };
     return (
         <div
@@ -240,7 +258,9 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                     <ColorPicker
                         defaultValue="#1677ff"
                         onChange={(e) => {
-                            setQRInfo({ ...qrInfo, color: e?.toHexString() });
+                            const info = { ...qrInfo, color: e?.toHexString() };
+                            setQRInfo(info);
+                            saveQrInfo(info);
                         }}
                     />
                     <Button onClick={onClickDownload}>下载</Button>
@@ -274,7 +294,9 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                                     : e === 66
                                     ? "Q"
                                     : "H";
-                            setQRInfo({ ...qrInfo, level });
+                            const info = { ...qrInfo, level } as const;
+                            setQRInfo(info);
+                            saveQrInfo(info);
                         }}
                     />
                 </Space>
@@ -289,7 +311,9 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                             addonBefore="图标大小"
                             defaultValue={32}
                             onChange={(e) => {
-                                setQRInfo({ ...qrInfo, iconSize: e || 32 });
+                                const info = { ...qrInfo, iconSize: e || 32 };
+                                setQRInfo(info);
+                                saveQrInfo(info);
                             }}
                         />
                     )}
@@ -304,13 +328,21 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({
                     size={"large"}
                 >
                     <Input
-                        placeholder="请输入内容"
+                        placeholder={
+                            !!qrInfo.content
+                                ? qrInfo.content == ""
+                                    ? "请输入内容"
+                                    : qrInfo.content
+                                : "请输入内容"
+                        }
                         allowClear
                         size="large"
                         addonBefore="二维码中的内容: "
                         type="text"
                         onChange={(e) => {
-                            setQRInfo({ ...qrInfo, content: e.target.value });
+                            const info = { ...qrInfo, content: e.target.value };
+                            setQRInfo(info);
+                            saveQrInfo(info);
                         }}
                     />
                     <Tooltip title="点击后显示一个新的窗口, 用于解析第三方二维码的内容, 将解析出的文本显示.">

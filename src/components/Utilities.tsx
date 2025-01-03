@@ -1,6 +1,6 @@
 import type { Breakpoint } from "antd";
 import { Grid } from "antd";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const { useBreakpoint: useAntdBreakpoint } = Grid;
 
@@ -16,6 +16,36 @@ function useLastStage<T>(value: T) {
 function useBreakpoint() {
     const screens = useAntdBreakpoint();
     return screens;
+}
+
+interface globalItem<T> {
+    get: () => T;
+    set: (content: T) => void;
+    remove: () => void;
+    content: T;
+}
+const globalStore = new Map<string, globalItem<unknown>>();
+export function useStore<T>(
+    key: string,
+    content: T
+): [() => T, (content: T) => void, () => void] {
+    let item = globalStore.get(key) as globalItem<T> | undefined;
+
+    if (!item) {
+        const newItem: globalItem<T> = {
+            content,
+            get: () => newItem.content,
+            set: (content: T) => {
+                newItem.content = content;
+            },
+            remove: () => {
+                globalStore.delete(key);
+            },
+        };
+        globalStore.set(key, newItem as globalItem<unknown>);
+        return [newItem.get, newItem.set, newItem.remove];
+    }
+    return [item.get, item.set, item.remove] as const;
 }
 
 // 类型定义
