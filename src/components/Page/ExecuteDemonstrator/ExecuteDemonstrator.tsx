@@ -30,7 +30,7 @@ interface CodeBlockParamType {
     varName: string;
     valueType: string;
     desc: string;
-    varList: { list: { var: string; varLineNumber: string }[] };
+    varList: { list: { var: string; varStepNumber: string }[] };
 }
 type CodeBlockParamsType = CodeBlockParamType[];
 interface Props {
@@ -78,6 +78,7 @@ const langTypeItems: MenuProps["items"] = Object.keys(langTypeLabel).map(
 );
 
 const ExecuteDemonstrator: React.FC = () => {
+    // TODO: 标记行所在步骤的序号
     // const [form] = Form.useForm();
 
     const demonstrator = TExecuteDemonstrator;
@@ -116,7 +117,7 @@ const ExecuteDemonstrator: React.FC = () => {
         demonstrator.params = codeBlockParams.map((item) => ({
             paramName: item.varName,
             value: item.varList.list.reduce((acc, cur) => {
-                acc[cur.varLineNumber] = cur.var;
+                acc[cur.varStepNumber] = cur.var;
                 return acc;
             }, {} as Record<string, string>),
         }));
@@ -279,10 +280,10 @@ const ExecuteDemonstrator: React.FC = () => {
                                                                                     noStyle
                                                                                     name={[
                                                                                         varField.name,
-                                                                                        "varLineNumber",
+                                                                                        "varStepNumber",
                                                                                     ]}
                                                                                 >
-                                                                                    <InputNumber placeholder="行数" />
+                                                                                    <InputNumber placeholder="值所在步骤" />
                                                                                 </Form.Item>
                                                                                 <Form.Item
                                                                                     noStyle
@@ -395,16 +396,19 @@ const ExecuteDemonstrator: React.FC = () => {
                         </div>
                     </Splitter.Panel>
                     <Splitter.Panel>
-                        {demonstrator.params
-                            .filter((param) => currentLine in param.value)
-                            .map((param, index) => (
-                                <Card
-                                    key={`param_${index}`}
-                                    title={param.paramName}
-                                >
-                                    {param.value[currentLine]}
-                                </Card>
-                            ))}
+                        {
+                            // TODO: 变量显示应该根据步骤, 而不是 当前行号
+                            demonstrator.params
+                                .filter((param) => currentLine in param.value)
+                                .map((param, index) => (
+                                    <Card
+                                        key={`param_${index}`}
+                                        title={param.paramName}
+                                    >
+                                        {param.value[currentLine]}
+                                    </Card>
+                                ))
+                        }
                     </Splitter.Panel>
                 </Splitter>
                 <Space>
