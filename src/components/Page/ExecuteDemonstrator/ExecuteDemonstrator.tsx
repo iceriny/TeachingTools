@@ -23,6 +23,7 @@ const SyntaxHighlighter = React.lazy(() => import("react-syntax-highlighter"));
 
 import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
 import { breakpointComparative, useBreakpoint } from "../../Utilities";
+import NumberListInput from "../../NumberListInput";
 
 const { useToken } = theme;
 
@@ -85,7 +86,6 @@ const ExecuteDemonstrator: React.FC = () => {
 
     const { token } = useToken();
     const [code, setCode] = useState<string>(demonstrator._code);
-    const [stepCount, setStepCount] = useState<number>(2);
     // const [codeSteps, setCodeSteps] = useState<number[]>([]);
     const [currentLine, setCurrentLine] = useState<number>(0);
     const [langType, setLangType] = useState<keyof typeof langTypeLabel>("cpp");
@@ -176,15 +176,22 @@ const ExecuteDemonstrator: React.FC = () => {
                         />
                     </Form.Item>
                     <Form.Item>
-                        <Input.OTP
-                            length={stepCount}
-                            variant="filled"
-                            onInput={(e) => {
-                                setStepCount(e.length + 2);
-                                demonstrator.steps = [
-                                    ...e.map((e) => parseInt(e)),
-                                ];
+                        <div
+                            style={{
+                                color: token.colorText,
+                                fontSize: token.fontSize,
                             }}
+                        >
+                            步骤:
+                        </div>
+                        <NumberListInput
+                        // variant="filled"
+                        // onInput={(e) => {
+                        //     setStepCount(e.length + 2);
+                        //     demonstrator.steps = [
+                        //         ...e.map((e) => parseInt(e)),
+                        //     ];
+                        // }}
                         />
                     </Form.Item>
                 </Space>
