@@ -1,6 +1,8 @@
 import Tool from "../BaseTool";
 import ExecuteDemonstrator from "../../components/Page/ExecuteDemonstrator";
 
+import type { ExecuteDemonstratorProps } from "../../components/Page/ExecuteDemonstrator";
+
 type CodeBlocksParamsValue = {
     [key in number]: string;
 };
@@ -20,7 +22,10 @@ interface CodeBlocksData extends CodeBlocksDataExceptCode {
 interface TExecuteDemonstratorProps extends CodeBlocksDataExceptCode {
     code: string;
 }
-class TExecuteDemonstrator extends Tool<typeof ExecuteDemonstrator> {
+class TExecuteDemonstrator extends Tool<
+    typeof ExecuteDemonstrator,
+    ExecuteDemonstratorProps
+> {
     _code: string;
     _codeLine: CodeBlocksData["code"];
     steps: CodeBlocksData["steps"];

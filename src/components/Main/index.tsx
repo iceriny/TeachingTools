@@ -150,7 +150,7 @@ const Main: React.FC<MainProps> = ({ notifyApi, themeChange, colorChange }) => {
     const GetPage = (key: PageName) => {
         switch (key) {
             case "nav_ExecuteDemonstrator":
-                return <TExecuteDemonstrator.component />;
+                return <TExecuteDemonstrator.component notifyApi={notifyApi} />;
             case "nav_DiceTool":
                 return <TDiceTool.component />;
             case "nav_RandomGenerator":
