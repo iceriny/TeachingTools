@@ -34,13 +34,9 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
     const [values, setValues] = useState<number[]>(value || []);
     const [length, setLength] = useState<number>(2);
 
-    const handlePressEnter = useCallback(
-        (_: number, index: number) => {
-            setLength(length + 1);
-            document.getElementById("input-" + (index + 2))?.focus();
-        },
-        [length, onChange]
-    );
+    const handlePressEnter = (_: number, index: number) => {
+        document.getElementById("input-" + (index + 2))?.focus();
+    };
     const handleChange = useCallback(
         (value: number, index: number) => {
             const newValues = [...values];
@@ -51,6 +47,20 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
         [values, onChange]
     );
 
+    const onBackspace = (index: number) => {
+        if (values.length > 0) {
+            const newValues = [...values];
+            newValues.splice(index, 1);
+            setValues(newValues);
+            onChange?.(newValues);
+            document.getElementById("input-" + index)?.focus();
+        }
+    };
+    useEffect(() => {
+        const newLength = values.length + 2;
+        if (length !== newLength) setLength(newLength);
+    }, [values, length]);
+
     return (
         <Flex gap={10} align="center" wrap>
             {getSingleNumberInputComponent(
@@ -58,6 +68,7 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
                 {
                     onPressEnter: handlePressEnter,
                     onChange: handleChange,
+                    onBackspace,
                 },
                 values
             )}

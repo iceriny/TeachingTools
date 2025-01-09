@@ -8,6 +8,7 @@ export interface SingleNumberInputProps {
     index: number;
     onChange?: (value: number, index: number) => void;
     onPressEnter?: (value: number, index: number) => void;
+    onBackspace?: (index: number) => void;
 }
 const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
     defaultValue,
@@ -16,6 +17,7 @@ const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
     index,
     onChange,
     onPressEnter,
+    onBackspace,
 }) => {
     const handleChange: InputNumberProps["onChange"] = (value) => {
         const newValue = parseInt(value as string);
@@ -23,13 +25,23 @@ const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
             onChange?.(newValue, index);
         }
     };
-    const handleonPressEnter: React.KeyboardEventHandler<HTMLInputElement> = (
+    const handlePressEnter: React.KeyboardEventHandler<HTMLInputElement> = (
         event
     ) => {
         const element = event.target as HTMLInputElement;
         const newValue = parseInt(element.value);
         if (!isNaN(newValue)) {
             onPressEnter?.(newValue, index);
+        }
+    };
+    const handleBackspace: React.KeyboardEventHandler<HTMLInputElement> = (
+        event
+    ) => {
+        if (
+            event.key === "Backspace" &&
+            (event.target as HTMLInputElement).value === ""
+        ) {
+            onBackspace?.(index);
         }
     };
     return (
@@ -50,7 +62,8 @@ const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
                 }em`,
             }}
             onChange={handleChange}
-            onPressEnter={handleonPressEnter}
+            onPressEnter={handlePressEnter}
+            onKeyDown={handleBackspace}
         />
     );
 };
