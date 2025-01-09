@@ -2,7 +2,7 @@ import { Button, Flex } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
 import SingleNumberInput, { SingleNumberInputProps } from "./SingleNumberInput";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface NumberListInputProps {
     length?: number;
@@ -22,7 +22,7 @@ function getSingleNumberInputComponent(
                 value={values?.[i]}
                 key={i}
                 id={"input-" + (i + 1)}
-                index={i + 1}
+                index={i}
                 {...props}
             />
         );
@@ -37,7 +37,7 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
     const handlePressEnter = useCallback(
         (_: number, index: number) => {
             setLength(length + 1);
-            document.getElementById("input-" + (index + 1))?.focus();
+            document.getElementById("input-" + (index + 2))?.focus();
         },
         [length, onChange]
     );
@@ -48,7 +48,7 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
             setValues(newValues);
             onChange?.(newValues);
         },
-        [onChange]
+        [values, onChange]
     );
 
     return (

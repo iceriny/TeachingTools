@@ -1,6 +1,5 @@
 import { InputNumber } from "antd";
 import type { InputNumberProps } from "antd";
-import { useState } from "react";
 
 export interface SingleNumberInputProps {
     defaultValue?: number;
@@ -18,14 +17,10 @@ const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
     onChange,
     onPressEnter,
 }) => {
-    const [inputValue, setInputValue] = useState<number | string>(
-        value || defaultValue || ""
-    );
     const handleChange: InputNumberProps["onChange"] = (value) => {
         const newValue = parseInt(value as string);
         if (!isNaN(newValue)) {
             onChange?.(newValue, index);
-            setInputValue(newValue);
         }
     };
     const handleonPressEnter: React.KeyboardEventHandler<HTMLInputElement> = (
@@ -41,17 +36,17 @@ const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
         <InputNumber
             id={id}
             defaultValue={defaultValue}
-            value={inputValue}
-            addonBefore={index}
+            value={value}
+            addonBefore={`${index}`}
             type="number"
             size="small"
             placeholder="行号"
             style={{
                 width: `${
                     5 +
-                    (typeof inputValue === "string"
+                    (value === undefined
                         ? 1
-                        : Math.abs(inputValue).toString().length - 1)
+                        : Math.abs(value).toString().length - 1)
                 }em`,
             }}
             onChange={handleChange}

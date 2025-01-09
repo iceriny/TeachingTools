@@ -17,7 +17,7 @@ import {
     theme,
     Typography,
 } from "antd";
-import React, { SyntheticEvent, useState, Suspense } from "react";
+import React, { SyntheticEvent, useState, Suspense, useEffect } from "react";
 // 动态加载组件
 const SyntaxHighlighter = React.lazy(() => import("react-syntax-highlighter"));
 
@@ -87,7 +87,10 @@ const ExecuteDemonstrator: React.FC = () => {
     const { token } = useToken();
     const [code, setCode] = useState<string>(demonstrator._code);
     // const [codeSteps, setCodeSteps] = useState<number[]>([]);
-    const [currentLine, setCurrentLine] = useState<number>(0);
+    const [stepsDate, setCurrentLine] = useState<{
+        currentLine: number;
+        cyrrentStepNumber: number;
+    }>({ currentLine: 0, cyrrentStepNumber: 0 });
     const [langType, setLangType] = useState<keyof typeof langTypeLabel>("cpp");
     const screens = useBreakpoint();
 
@@ -97,32 +100,55 @@ const ExecuteDemonstrator: React.FC = () => {
         demonstrator.code = target.value;
         setCode(target.value);
     };
-    const handleNextLine: (event: SyntheticEvent) => void = () => {
+    const handleNextLine: () => void = () => {
         // TODO: 处理点击按钮进入下一步的代码.
-        const nextLineNumber = demonstrator.nextStep();
-        console.log(nextLineNumber, demonstrator.steps);
-        setCurrentLine(nextLineNumber);
+        const [nextLineNumber, nextStep] = demonstrator.nextStep();
+        setCurrentLine({
+            currentLine: nextLineNumber,
+            cyrrentStepNumber: nextStep,
+        });
     };
-    const handlePrevLine: (event: SyntheticEvent) => void = () => {
+    const handlePrevLine: () => void = () => {
         // TODO: 处理点击按钮进入上一步的代码.
-        const prevLineNumber = demonstrator.prevStep();
-        console.log(prevLineNumber, demonstrator.steps);
-        setCurrentLine(prevLineNumber);
+        const [prevLineNumber, prevStep] = demonstrator.prevStep();
+        setCurrentLine({
+            currentLine: prevLineNumber,
+            cyrrentStepNumber: prevStep,
+        });
     };
     const handleFormSubmit: FormProps["onFinish"] = (value) => {
         // TODO: 处理提交按钮.
         const codeBlockParams: CodeBlockParamsType = value[
             "code-input"
-        ].params.item.filter((item: { varName: string }) => item.varName);
-        demonstrator.params = codeBlockParams.map((item) => ({
+        ].params?.item.filter((item: { varName: string }) => item.varName);
+
+        demonstrator.params = codeBlockParams?.map((item) => ({
             paramName: item.varName,
             value: item.varList.list.reduce((acc, cur) => {
                 acc[cur.varStepNumber] = cur.var;
                 return acc;
             }, {} as Record<string, string>),
         }));
-        console.log(demonstrator.params);
     };
+    useEffect(() => {
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight") {
+                handleNextLine();
+            } else if (e.key === "ArrowLeft") {
+                handlePrevLine();
+            }
+        });
+
+        return () => {
+            window.removeEventListener("keydown", (e) => {
+                if (e.key === "ArrowRight") {
+                    handleNextLine();
+                } else if (e.key === "ArrowLeft") {
+                    handlePrevLine();
+                }
+            });
+        };
+    }, []);
     return (
         <div>
             <Form
@@ -185,13 +211,9 @@ const ExecuteDemonstrator: React.FC = () => {
                             步骤:
                         </div>
                         <NumberListInput
-                        // variant="filled"
-                        // onInput={(e) => {
-                        //     setStepCount(e.length + 2);
-                        //     demonstrator.steps = [
-                        //         ...e.map((e) => parseInt(e)),
-                        //     ];
-                        // }}
+                            onChange={(e) => {
+                                demonstrator.steps = [...e];
+                            }}
                         />
                     </Form.Item>
                 </Space>
@@ -384,12 +406,14 @@ const ExecuteDemonstrator: React.FC = () => {
                                             // onClick: () => handleLineClick(lineNumber),
                                             style: {
                                                 backgroundColor:
-                                                    lineNumber == currentLine
+                                                    lineNumber ==
+                                                    stepsDate.currentLine
                                                         ? blue[2]
                                                         : "transparent",
                                                 padding: "3px 10px 3px 3px",
                                                 margin:
-                                                    lineNumber == currentLine
+                                                    lineNumber ==
+                                                    stepsDate.currentLine
                                                         ? "50px 0 100px 0"
                                                         : 0,
                                                 borderRadius: "5px",
@@ -403,19 +427,19 @@ const ExecuteDemonstrator: React.FC = () => {
                         </div>
                     </Splitter.Panel>
                     <Splitter.Panel>
-                        {
-                            // TODO: 变量显示应该根据步骤, 而不是 当前行号
-                            demonstrator.params
-                                .filter((param) => currentLine in param.value)
-                                .map((param, index) => (
-                                    <Card
-                                        key={`param_${index}`}
-                                        title={param.paramName}
-                                    >
-                                        {param.value[currentLine]}
-                                    </Card>
-                                ))
-                        }
+                        {demonstrator.params
+                            ?.filter(
+                                (param) =>
+                                    stepsDate.cyrrentStepNumber in param.value
+                            )
+                            .map((param, index) => (
+                                <Card
+                                    key={`param_${index}`}
+                                    title={param.paramName}
+                                >
+                                    {param.value[stepsDate.cyrrentStepNumber]}
+                                </Card>
+                            ))}
                     </Splitter.Panel>
                 </Splitter>
                 <Space>

@@ -70,7 +70,6 @@ class TExecuteDemonstrator extends Tool<typeof ExecuteDemonstrator> {
         return this._currentStep;
     }
     set currentLine(value: number) {
-        console.log("value: ", value, this.steps.length, this.codeLine.length);
         if (value < 0) {
             this._currentLine = this.codeLine.length - 1;
         } else if (value > this.codeLine.length) {
@@ -86,9 +85,12 @@ class TExecuteDemonstrator extends Tool<typeof ExecuteDemonstrator> {
     /**
      * @returns 下一步步骤的行号.
      */
-    nextStep(): number {
+    nextStep(): [number, number] {
         this.currentStep++;
-        return this.steps[this.currentStep] ?? this.currentLine++;
+        return [
+            this.steps[this.currentStep] ?? this.currentLine++,
+            this.currentStep,
+        ];
     }
     /**
      * 将当前步骤重置为0
@@ -99,9 +101,12 @@ class TExecuteDemonstrator extends Tool<typeof ExecuteDemonstrator> {
     /**
      * @returns 上一步步骤的行号
      */
-    prevStep(): number {
+    prevStep(): [number, number] {
         this.currentStep--;
-        return this.steps[this.currentStep] ?? this.currentLine--;
+        return [
+            this.steps[this.currentStep] ?? this.currentLine--,
+            this.currentStep,
+        ];
     }
 }
 const instance = TExecuteDemonstrator.getInstance({
