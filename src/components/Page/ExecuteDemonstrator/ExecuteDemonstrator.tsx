@@ -31,7 +31,7 @@ interface CodeBlockParamType {
     varName: string;
     valueType: string;
     desc: string;
-    varList: { list: { var: string; varStepNumber: string }[] };
+    varList: { list: { var: string; varStepNumber: number }[] };
 }
 type CodeBlockParamsType = CodeBlockParamType[];
 interface Props {
@@ -122,13 +122,32 @@ const ExecuteDemonstrator: React.FC = () => {
             "code-input"
         ].params?.item.filter((item: { varName: string }) => item.varName);
 
-        demonstrator.params = codeBlockParams?.map((item) => ({
-            paramName: item.varName,
-            value: item.varList.list.reduce((acc, cur) => {
+        demonstrator.params = codeBlockParams?.map((item) => {
+            const varList = item.varList.list.reduce((acc, cur) => {
                 acc[cur.varStepNumber] = cur.var;
                 return acc;
-            }, {} as Record<string, string>),
-        }));
+            }, {} as Record<number, string>);
+
+            const varListTemp: Record<number, string> = {};
+            for (const item of Object.entries(varList)) {
+                const step = parseInt(item[0]);
+                const thisValue = item[1];
+                for (let i = 0; i < demonstrator.steps.length; i++) {
+                    if (i >= step) {
+                        if (thisValue.toLowerCase() === "$end") {
+                            delete varListTemp[i];
+                            continue;
+                        }
+
+                        varListTemp[i] = thisValue;
+                    }
+                }
+            }
+            return {
+                paramName: item.varName,
+                value: varListTemp,
+            };
+        });
     };
     useEffect(() => {
         window.addEventListener("keydown", (e) => {
