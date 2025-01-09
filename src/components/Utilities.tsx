@@ -224,6 +224,34 @@ function getValueFromBreakpoint<T extends Record<Breakpoint, unknown>>(
     }
 }
 
+/**
+ * 进行HTML转义
+ * @param str 要转义的字符串
+ * @returns 转义后的字符串
+ */
+function escapeHTML(str: string) {
+    return str
+        .replace(/&nbsp;/g, " ")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+/**
+ * 进行HTML逆转义
+ * @param str 要逆转义的字符串
+ * @returns 逆转义后的字符串
+ */
+function unescapeHTML(str: string): string {
+    return str
+        .replace(/&nbsp;/g, "\u00A0")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&amp;/g, "&");
+}
 export {
     useLastStage,
     useBreakpoint,
@@ -232,6 +260,8 @@ export {
     getCurrentBreakpoint,
     breakpointComparative,
     getValueFromBreakpoint,
+    escapeHTML,
+    unescapeHTML,
     DEFAULT_PRIMARY_COLOR,
     DEFAULT_BG_COLOR,
 };

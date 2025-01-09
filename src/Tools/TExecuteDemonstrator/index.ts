@@ -4,7 +4,7 @@ import ExecuteDemonstrator from "../../components/Page/ExecuteDemonstrator";
 type CodeBlocksParamsValue = {
     [key in number]: string;
 };
-type CodeBlocksParams = {
+export type CodeBlocksParams = {
     paramName: string;
     value: CodeBlocksParamsValue;
     type?: string;

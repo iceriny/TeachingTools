@@ -8,6 +8,7 @@ interface NumberListInputProps {
     length?: number;
     value?: number[];
     onChange?: (value: number[]) => void;
+    onClear?: () => void;
 }
 
 function getSingleNumberInputComponent(
@@ -30,8 +31,14 @@ function getSingleNumberInputComponent(
     return components;
 }
 
-const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
-    const [values, setValues] = useState<number[]>(value || []);
+const Main: React.FC<NumberListInputProps> = ({
+    value: values,
+    onChange,
+    onClear,
+}) => {
+    // const [values, setValues] = useState<number[]>(value || []);
+    values = values || [];
+
     const [length, setLength] = useState<number>(2);
 
     const handlePressEnter = (_: number, index: number) => {
@@ -41,7 +48,7 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
         (value: number, index: number) => {
             const newValues = [...values];
             newValues[index] = value;
-            setValues(newValues);
+            // setValues(newValues);
             onChange?.(newValues);
         },
         [values, onChange]
@@ -51,7 +58,7 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
         if (values.length > 0) {
             const newValues = [...values];
             newValues.splice(index, 1);
-            setValues(newValues);
+            // setValues(newValues);
             onChange?.(newValues);
             document.getElementById("input-" + index)?.focus();
         }
@@ -78,8 +85,9 @@ const Main: React.FC<NumberListInputProps> = ({ value, onChange }) => {
                     size="small"
                     icon={<DeleteOutlined />}
                     onClick={() => {
-                        setValues([]);
+                        // setValues([]);
                         setLength(2);
+                        onClear?.();
                     }}
                 />
             )}

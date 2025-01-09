@@ -17,13 +17,20 @@ import {
     theme,
     Typography,
 } from "antd";
-import React, { SyntheticEvent, useState, Suspense, useEffect } from "react";
+import React, {
+    Suspense,
+    SyntheticEvent,
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 // 动态加载组件
 const SyntaxHighlighter = React.lazy(() => import("react-syntax-highlighter"));
 
 import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
-import { breakpointComparative, useBreakpoint } from "../../Utilities";
+import type { CodeBlocksParams } from "../../../Tools/TExecuteDemonstrator";
 import NumberListInput from "../../NumberListInput";
+import { breakpointComparative, useBreakpoint } from "../../Utilities";
 
 const { useToken } = theme;
 
@@ -78,16 +85,23 @@ const langTypeItems: MenuProps["items"] = Object.keys(langTypeLabel).map(
     })
 );
 
+interface ExportData {
+    code: string;
+    langType: keyof typeof langTypeLabel;
+    codeBlockParams: CodeBlocksParams[];
+    steps: number[];
+}
+
 const ExecuteDemonstrator: React.FC = () => {
     // TODO: 标记行所在步骤的序号
-    // const [form] = Form.useForm();
+    const [form] = Form.useForm();
 
     const demonstrator = TExecuteDemonstrator;
 
     const { token } = useToken();
     const [code, setCode] = useState<string>(demonstrator._code);
-    // const [codeSteps, setCodeSteps] = useState<number[]>([]);
-    const [stepsDate, setCurrentLine] = useState<{
+    const [codeSteps, setCodeSteps] = useState<number[]>([]);
+    const [stepsDate, setStepsDate] = useState<{
         currentLine: number;
         cyrrentStepNumber: number;
     }>({ currentLine: 0, cyrrentStepNumber: 0 });
@@ -101,26 +115,23 @@ const ExecuteDemonstrator: React.FC = () => {
         setCode(target.value);
     };
     const handleNextLine: () => void = () => {
-        // TODO: 处理点击按钮进入下一步的代码.
         const [nextLineNumber, nextStep] = demonstrator.nextStep();
-        setCurrentLine({
+        setStepsDate({
             currentLine: nextLineNumber,
             cyrrentStepNumber: nextStep,
         });
     };
     const handlePrevLine: () => void = () => {
-        // TODO: 处理点击按钮进入上一步的代码.
         const [prevLineNumber, prevStep] = demonstrator.prevStep();
-        setCurrentLine({
+        setStepsDate({
             currentLine: prevLineNumber,
             cyrrentStepNumber: prevStep,
         });
     };
     const handleFormSubmit: FormProps["onFinish"] = (value) => {
-        // TODO: 处理提交按钮.
         const codeBlockParams: CodeBlockParamsType = value[
             "code-input"
-        ].params?.item.filter((item: { varName: string }) => item.varName);
+        ].params?.filter((item: { varName: string }) => item.varName);
 
         demonstrator.params = codeBlockParams?.map((item) => {
             const varList = item.varList.list.reduce((acc, cur) => {
@@ -129,6 +140,7 @@ const ExecuteDemonstrator: React.FC = () => {
             }, {} as Record<number, string>);
 
             const varListTemp: Record<number, string> = {};
+
             for (const item of Object.entries(varList)) {
                 const step = parseInt(item[0]);
                 const thisValue = item[1];
@@ -146,9 +158,65 @@ const ExecuteDemonstrator: React.FC = () => {
             return {
                 paramName: item.varName,
                 value: varListTemp,
+                type: item.valueType,
+                description: item.desc,
             };
         });
     };
+
+    const handleExportData: () => void = () => {
+        const data: ExportData = {
+            code,
+            langType,
+            codeBlockParams: demonstrator.params,
+            steps: demonstrator.steps,
+        };
+        navigator.clipboard.writeText(JSON.stringify(data));
+    };
+    const handleImportData = useCallback(() => {
+        navigator.clipboard.readText().then((text) => {
+            const data: ExportData = JSON.parse(text);
+
+            demonstrator.code = data.code;
+            setCode(data.code);
+            form.setFieldValue(["code-input", "code"], data.code);
+
+            demonstrator.params = data.codeBlockParams;
+            form.setFieldValue(
+                ["code-input", "params"],
+                data.codeBlockParams.map((item) => {
+                    let preVar: string | null = null;
+                    const varList = Object.entries(item.value).map((item) => {
+                        const varListItem = {
+                            var: item[1],
+                            varStepNumber: parseInt(item[0]),
+                        };
+                        if (preVar === varListItem.var) {
+                            return;
+                        } else {
+                            preVar = varListItem.var;
+                        }
+                        return varListItem;
+                    });
+
+                    return {
+                        varName: item.paramName,
+                        valueType: item.type,
+                        desc: item.description,
+                        varList: {
+                            list: varList.filter((item) => item !== undefined),
+                        },
+                    };
+                })
+            );
+
+            demonstrator.steps = data.steps;
+            setCodeSteps(data.steps);
+
+            setLangType(data.langType);
+        });
+    }, []);
+
     useEffect(() => {
         window.addEventListener("keydown", (e) => {
             if (e.key === "ArrowRight") {
@@ -171,16 +239,13 @@ const ExecuteDemonstrator: React.FC = () => {
     return (
         <div>
             <Form
+                form={form}
                 layout="vertical"
                 name="code-input"
                 onFinish={handleFormSubmit}
             >
-                <Space
-                    direction="vertical"
-                    size={30}
-                    style={{ display: "flex" }}
-                >
-                    <Space size={30}>
+                <Flex vertical gap={30} style={{ display: "flex" }}>
+                    <Flex gap={15}>
                         <div
                             style={{
                                 color: token.colorText,
@@ -201,10 +266,10 @@ const ExecuteDemonstrator: React.FC = () => {
                             }}
                         >
                             <a onClick={(e) => e.preventDefault()}>
-                                <Space>{langTypeLabel[langType]}</Space>
+                                <Flex>{langTypeLabel[langType]}</Flex>
                             </a>
                         </Dropdown.Button>
-                    </Space>
+                    </Flex>
                     <Form.Item
                         name={["code-input", "code"]}
                         rules={[
@@ -220,7 +285,8 @@ const ExecuteDemonstrator: React.FC = () => {
                             onChange={handleCodeChange}
                         />
                     </Form.Item>
-                    <Form.Item>
+                    <Divider style={{ margin: "0" }} />
+                    <Flex vertical gap={15}>
                         <div
                             style={{
                                 color: token.colorText,
@@ -230,17 +296,20 @@ const ExecuteDemonstrator: React.FC = () => {
                             步骤:
                         </div>
                         <NumberListInput
+                            value={codeSteps}
                             onChange={(e) => {
-                                demonstrator.steps = [...e];
+                                demonstrator.steps = e;
+                                setCodeSteps(e);
+                            }}
+                            onClear={() => {
+                                demonstrator.steps = [];
+                                setCodeSteps([]);
                             }}
                         />
-                    </Form.Item>
-                </Space>
-                <Space
-                    direction="vertical"
-                    size={30}
-                    style={{ display: "flex" }}
-                >
+                    </Flex>
+                </Flex>
+                <Divider />
+                <Flex vertical gap={15}>
                     <div
                         style={{
                             color: token.colorText,
@@ -249,157 +318,139 @@ const ExecuteDemonstrator: React.FC = () => {
                     >
                         参数:
                     </div>
-                    <Form.Item name={["code-input", "params"]}>
-                        <Form.List name={["code-input", "params", "item"]}>
-                            {(fields, opt) => (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        rowGap: 16,
-                                    }}
-                                >
-                                    {fields.map((field) => (
-                                        <Card key={`${field.key}_item`}>
-                                            <Space key={field.key}>
-                                                <Form.Item
-                                                    noStyle
+                    <Form.List name={["code-input", "params"]}>
+                        {(fields, opt) => (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    rowGap: 16,
+                                }}
+                            >
+                                {fields.map((field) => (
+                                    <Card key={`${field.key}_item`}>
+                                        <Space key={field.key}>
+                                            <Form.Item
+                                                noStyle
+                                                name={[field.name, "varName"]}
+                                            >
+                                                <Input placeholder="变量名" />
+                                            </Form.Item>
+                                            <Form.Item
+                                                noStyle
+                                                name={[field.name, "valueType"]}
+                                            >
+                                                <Input placeholder="变量值类型" />
+                                            </Form.Item>
+                                            <Form.Item
+                                                noStyle
+                                                name={[field.name, "desc"]}
+                                            >
+                                                <Input placeholder="说明" />
+                                            </Form.Item>
+                                            <Flex key={`${field.key}_var`}>
+                                                <Divider type="vertical" />
+                                                <Form.List
                                                     name={[
                                                         field.name,
-                                                        "varName",
+                                                        "varList",
+                                                        "list",
                                                     ]}
                                                 >
-                                                    <Input placeholder="变量名" />
-                                                </Form.Item>
-                                                <Form.Item
-                                                    noStyle
-                                                    name={[
-                                                        field.name,
-                                                        "valueType",
-                                                    ]}
-                                                >
-                                                    <Input placeholder="变量值类型" />
-                                                </Form.Item>
-                                                <Form.Item
-                                                    noStyle
-                                                    name={[field.name, "desc"]}
-                                                >
-                                                    <Input placeholder="说明" />
-                                                </Form.Item>
-                                                <Space key={`${field.key}_var`}>
-                                                    <Divider type="vertical" />
-                                                    <Form.Item
-                                                        noStyle
-                                                        name={[
-                                                            field.name,
-                                                            "varList",
-                                                        ]}
-                                                    >
-                                                        <Form.List
-                                                            name={[
-                                                                field.name,
-                                                                "varList",
-                                                                "list",
-                                                            ]}
+                                                    {(varField, varOtp) => (
+                                                        <div
+                                                            style={{
+                                                                display: "flex",
+                                                                flexDirection:
+                                                                    "column",
+                                                                rowGap: 16,
+                                                            }}
                                                         >
-                                                            {(
-                                                                varField,
-                                                                varOtp
-                                                            ) => (
-                                                                <div
-                                                                    style={{
-                                                                        display:
-                                                                            "flex",
-                                                                        flexDirection:
-                                                                            "column",
-                                                                        rowGap: 16,
-                                                                    }}
-                                                                >
-                                                                    {varField.map(
-                                                                        (
-                                                                            varField
-                                                                        ) => (
-                                                                            <Space
-                                                                                key={
-                                                                                    varField.key
-                                                                                }
-                                                                            >
-                                                                                <Form.Item
-                                                                                    noStyle
-                                                                                    name={[
-                                                                                        varField.name,
-                                                                                        "varStepNumber",
-                                                                                    ]}
-                                                                                >
-                                                                                    <InputNumber placeholder="值所在步骤" />
-                                                                                </Form.Item>
-                                                                                <Form.Item
-                                                                                    noStyle
-                                                                                    name={[
-                                                                                        varField.name,
-                                                                                        "var",
-                                                                                    ]}
-                                                                                >
-                                                                                    <Input placeholder="值" />
-                                                                                </Form.Item>
-                                                                                <CloseOutlined
-                                                                                    onClick={() => {
-                                                                                        varOtp.remove(
-                                                                                            varField.name
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                            </Space>
-                                                                        )
-                                                                    )}
-                                                                    <Button
-                                                                        type="dashed"
-                                                                        onClick={() =>
-                                                                            varOtp.add()
+                                                            {varField.map(
+                                                                (varField) => (
+                                                                    <Flex
+                                                                        gap={15}
+                                                                        key={
+                                                                            varField.key
                                                                         }
-                                                                        block
                                                                     >
-                                                                        +
-                                                                        添加变量数据
-                                                                    </Button>
-                                                                </div>
+                                                                        <Form.Item
+                                                                            noStyle
+                                                                            name={[
+                                                                                varField.name,
+                                                                                "varStepNumber",
+                                                                            ]}
+                                                                        >
+                                                                            <InputNumber placeholder="值所在步骤" />
+                                                                        </Form.Item>
+                                                                        <Form.Item
+                                                                            noStyle
+                                                                            name={[
+                                                                                varField.name,
+                                                                                "var",
+                                                                            ]}
+                                                                        >
+                                                                            <Input placeholder="值" />
+                                                                        </Form.Item>
+                                                                        <CloseOutlined
+                                                                            onClick={() => {
+                                                                                varOtp.remove(
+                                                                                    varField.name
+                                                                                );
+                                                                            }}
+                                                                        />
+                                                                    </Flex>
+                                                                )
                                                             )}
-                                                        </Form.List>
-                                                    </Form.Item>
-                                                </Space>
+                                                            <Button
+                                                                type="dashed"
+                                                                onClick={() =>
+                                                                    varOtp.add()
+                                                                }
+                                                                block
+                                                            >
+                                                                + 添加变量数据
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </Form.List>
+                                            </Flex>
 
-                                                <CloseOutlined
-                                                    onClick={() => {
-                                                        opt.remove(field.name);
-                                                    }}
-                                                />
-                                            </Space>
-                                        </Card>
-                                    ))}
-                                    <Button
-                                        type="dashed"
-                                        onClick={() => opt.add()}
-                                        block
-                                    >
-                                        + 添加变量
-                                    </Button>
-                                </div>
-                            )}
-                        </Form.List>
-                    </Form.Item>
-                </Space>
-                <Form.Item>
+                                            <CloseOutlined
+                                                onClick={() => {
+                                                    opt.remove(field.name);
+                                                }}
+                                            />
+                                        </Space>
+                                    </Card>
+                                ))}
+                                <Button
+                                    type="dashed"
+                                    onClick={() => opt.add()}
+                                    block
+                                >
+                                    + 添加变量
+                                </Button>
+                            </div>
+                        )}
+                    </Form.List>
+                </Flex>
+                <Divider />
+                <Flex gap={15}>
                     <Button type="primary" htmlType="submit">
                         提交
                     </Button>
-                </Form.Item>
+                    <Button type="primary" onClick={handleImportData}>
+                        导入数据
+                    </Button>
+                    <Button type="primary" onClick={handleExportData}>
+                        保存数据
+                    </Button>
+                </Flex>
+                <Divider />
             </Form>
 
-            <Space
-                direction="vertical"
-                size="middle"
-                style={{ display: "flex" }}
-            >
+            <Flex vertical gap="middle">
                 <Splitter
                     layout={
                         breakpointComparative(screens, "md")
@@ -455,17 +506,18 @@ const ExecuteDemonstrator: React.FC = () => {
                                 <Card
                                     key={`param_${index}`}
                                     title={param.paramName}
+                                    style={{ whiteSpace: "pre-wrap" }}
                                 >
                                     {param.value[stepsDate.cyrrentStepNumber]}
                                 </Card>
                             ))}
                     </Splitter.Panel>
                 </Splitter>
-                <Space>
+                <Flex gap={15}>
                     <Button onClick={handlePrevLine}>上一步</Button>
                     <Button onClick={handleNextLine}>下一步</Button>
-                </Space>
-            </Space>
+                </Flex>
+            </Flex>
         </div>
     );
 };
