@@ -26,6 +26,7 @@ import React, {
     SyntheticEvent,
     useCallback,
     useEffect,
+    useRef,
     useState,
 } from "react";
 // 动态加载组件
@@ -90,6 +91,129 @@ const langTypeItems: MenuProps["items"] = Object.keys(langTypeLabel).map(
         label: langTypeLabel[key as keyof typeof langTypeLabel],
     })
 );
+const openNotification = (
+    notifyApi: NotificationInstance,
+    importExample: () => void
+) => {
+    notifyApi.open({
+        key: NOTIFICATION_KEY,
+        duration: 10,
+        message: (
+            <>
+                <Typography.Title level={5}>
+                    程序执行演示器说明
+                </Typography.Title>
+                <Typography.Text type="secondary">
+                    鼠标悬浮此处保持打开
+                </Typography.Text>
+            </>
+        ),
+        style: { width: "500px" },
+        description: (
+            <>
+                <Divider />
+                <Paragraphs
+                    strings={[
+                        "该工具用于模拟程序执行过程, 帮助理解程序逻辑.",
+                        "要使用本工具, 首先在源代码输入框输入要演示的程序源代码.",
+                        <>
+                            然后在
+                            <Typography.Text type="success">
+                                步骤
+                            </Typography.Text>
+                            列表中输入程序的运行顺序
+                        </>,
+                        "例如 1, 2, 3, 2, 3, 2, 3, 4, 5, 6 ... ",
+                        <>
+                            指的是, 程序执行 第1行 第2行 第3行, 然后回到 第2行,
+                            第3行, 再继续是(数字代表行号): 2 =&gt; 3 =&gt; 2
+                            =&gt; 3 =&gt; 4 =&gt; 5 =&gt; 6 ...
+                        </>,
+                        <>
+                            再继续填入
+                            <Typography.Text type="success">
+                                参数
+                            </Typography.Text>
+                            部分, 即程序运行时的变量值.
+                        </>,
+                        <>
+                            参数有:{" "}
+                            <Typography.Text type="success">
+                                参数名
+                            </Typography.Text>
+                            ,{" "}
+                            <Typography.Text type="success">
+                                变量类型
+                            </Typography.Text>
+                            ,{" "}
+                            <Typography.Text type="success">
+                                说明
+                            </Typography.Text>{" "}
+                            以上三个通用属性
+                        </>,
+                        <>
+                            变量何时可见, 以及其值的变化是靠后面的{" "}
+                            <Typography.Text type="success">
+                                变量数据
+                            </Typography.Text>{" "}
+                            决定的
+                        </>,
+                        <>
+                            变量数据有两个属性{" "}
+                            <Typography.Text type="success">
+                                值所在步骤
+                            </Typography.Text>{" "}
+                            和变量具体的{" "}
+                            <Typography.Text type="success">值</Typography.Text>{" "}
+                            本身.
+                        </>,
+
+                        <>
+                            顾名思义, 就是该变量, 在{" "}
+                            <Typography.Text type="success">
+                                值所在步骤
+                            </Typography.Text>{" "}
+                            时{" "}
+                            <Typography.Text type="success">值</Typography.Text>{" "}
+                            是多少.
+                        </>,
+                        <>
+                            <Typography.Text type="success">
+                                值所在步骤
+                            </Typography.Text>{" "}
+                            对应了上面在步骤列表定义步骤时所显示的序号(从0开始).
+                        </>,
+                        '例如, 变量名写为 a , 变量类型写为 int , 说明写为"这是一个整型变量",',
+                        "然后变量属性中, 值所在步骤写为 1, 值写为 10, 这代表, 在步骤1时, 变量a的值为10, 在步骤1之后, a变量值不会发生改变, 直到再次定义其值.",
+                        <>
+                            如果变量的值被定义为{" "}
+                            <Typography.Text type="success">
+                                $end
+                            </Typography.Text>{" "}
+                            , 则该变量被删除(模拟离开作用于, 或使用delate)
+                        </>,
+                        <>
+                            <Typography.Text type="success">
+                                导入数据
+                            </Typography.Text>{" "}
+                            <Typography.Text type="success">
+                                导出(保存)数据
+                            </Typography.Text>{" "}
+                            可以分别导入剪切板的数据, 以及保存数据到剪切板,
+                            保存时可以保存为JSON文件.
+                        </>,
+                        "VV 可以导入 示例 进行测试和学习 VV",
+                        <Button type="link" onClick={importExample}>
+                            导入演示
+                        </Button>,
+                    ]}
+                />
+            </>
+        ),
+        showProgress: true,
+        pauseOnHover: true,
+    });
+};
 
 interface ExportData {
     code: string;
@@ -138,6 +262,13 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
             cyrrentStepNumber: prevStep,
         });
     };
+    const handleReset: () => void = () => {
+        const [lineNumber, step] = demonstrator.initStep();
+        setStepsDate({
+            currentLine: lineNumber,
+            cyrrentStepNumber: step,
+        });
+    };
     const handleFormSubmit: FormProps["onFinish"] = (value) => {
         const codeBlockParams: CodeBlockParamsType = value[
             "code-input"
@@ -154,17 +285,21 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
             for (const item of Object.entries(varList)) {
                 const step = parseInt(item[0]);
                 const thisValue = item[1];
+
                 for (let i = 0; i < demonstrator.steps.length; i++) {
                     if (i >= step) {
-                        if (thisValue.toLowerCase() === "$end") {
-                            delete varListTemp[i];
-                            continue;
-                        }
+                        // if (thisValue.toLowerCase() === "$end") {
+                        //     if (varListTemp[i - 1] === "$end") {
+                        //         delete varListTemp[i];
+                        //         continue;
+                        //     }
+                        // }
 
                         varListTemp[i] = thisValue;
                     }
                 }
             }
+            console.log(varListTemp);
             return {
                 paramName: item.varName,
                 value: varListTemp,
@@ -183,58 +318,64 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
         };
         navigator.clipboard.writeText(JSON.stringify(data));
     };
+    const importData = useCallback((data: ExportData) => {
+        demonstrator.code = data.code;
+        setCode(data.code);
+        form.setFieldValue(["code-input", "code"], data.code);
+
+        demonstrator.params = data.codeBlockParams;
+        form.setFieldValue(
+            ["code-input", "params"],
+            data.codeBlockParams.map((item) => {
+                let preVar: string | null = null;
+                const varList = Object.entries(item.value).map((item) => {
+                    const varListItem = {
+                        var: item[1],
+                        varStepNumber: parseInt(item[0]),
+                    };
+                    if (preVar === varListItem.var) {
+                        return;
+                    } else {
+                        preVar = varListItem.var;
+                    }
+                    return varListItem;
+                });
+
+                return {
+                    varName: item.paramName,
+                    valueType: item.type,
+                    desc: item.description,
+                    varList: {
+                        list: varList.filter((item) => item !== undefined),
+                    },
+                };
+            })
+        );
+
+        demonstrator.steps = data.steps;
+        setCodeSteps(data.steps);
+
+        setLangType(data.langType);
+    }, []);
     const handleImportData = useCallback(() => {
         navigator.clipboard.readText().then((text) => {
             const data: ExportData = JSON.parse(text);
-
-            demonstrator.code = data.code;
-            setCode(data.code);
-            form.setFieldValue(["code-input", "code"], data.code);
-
-            demonstrator.params = data.codeBlockParams;
-            form.setFieldValue(
-                ["code-input", "params"],
-                data.codeBlockParams.map((item) => {
-                    let preVar: string | null = null;
-                    const varList = Object.entries(item.value).map((item) => {
-                        const varListItem = {
-                            var: item[1],
-                            varStepNumber: parseInt(item[0]),
-                        };
-                        if (preVar === varListItem.var) {
-                            return;
-                        } else {
-                            preVar = varListItem.var;
-                        }
-                        return varListItem;
-                    });
-
-                    return {
-                        varName: item.paramName,
-                        valueType: item.type,
-                        desc: item.description,
-                        varList: {
-                            list: varList.filter((item) => item !== undefined),
-                        },
-                    };
-                })
-            );
-
-            demonstrator.steps = data.steps;
-            setCodeSteps(data.steps);
-
-            setLangType(data.langType);
+            importData(data);
         });
     }, []);
 
+    const keyDownListenerAdded = useRef(false);
     useEffect(() => {
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowRight") {
-                handleNextLine();
-            } else if (e.key === "ArrowLeft") {
-                handlePrevLine();
-            }
-        });
+        if (!keyDownListenerAdded.current) {
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "ArrowRight") {
+                    handleNextLine();
+                } else if (e.key === "ArrowLeft") {
+                    handlePrevLine();
+                }
+            });
+            keyDownListenerAdded.current = true;
+        }
 
         return () => {
             window.removeEventListener("keydown", (e) => {
@@ -247,123 +388,31 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
         };
     }, []);
 
-    const openNotification = () => {
-        notifyApi.open({
-            key: NOTIFICATION_KEY,
-            duration: 10,
-            message: (
-                <>
-                    <Typography.Title level={5}>
-                        程序执行演示器说明
-                    </Typography.Title>
-                    <Typography.Text type="secondary">
-                        鼠标悬浮此处保持打开
-                    </Typography.Text>
-                </>
-            ),
-            style: { width: "500px" },
-            description: (
-                <>
-                    <Divider />
-                    <Paragraphs
-                        strings={[
-                            "该工具用于模拟程序执行过程, 帮助理解程序逻辑.",
-                            "要使用本工具, 首先在源代码输入框输入要演示的程序源代码.",
-                            <>
-                                然后在
-                                <Typography.Text type="success">
-                                    步骤
-                                </Typography.Text>
-                                列表中输入程序的运行顺序
-                            </>,
-                            "例如 1, 2, 3, 2, 3, 2, 3, 4, 5, 6 ... ",
-                            <>
-                                指的是, 程序执行 第1行 第2行 第3行, 然后回到
-                                第2行, 第3行, 再继续是(数字代表行号): 2 =&gt; 3
-                                =&gt; 2 =&gt; 3 =&gt; 4 =&gt; 5 =&gt; 6 ...
-                            </>,
-                            <>
-                                再继续填入
-                                <Typography.Text type="success">
-                                    参数
-                                </Typography.Text>
-                                部分, 即程序运行时的变量值.
-                            </>,
-                            <>
-                                参数有:{" "}
-                                <Typography.Text type="success">
-                                    参数名
-                                </Typography.Text>
-                                ,{" "}
-                                <Typography.Text type="success">
-                                    变量类型
-                                </Typography.Text>
-                                ,{" "}
-                                <Typography.Text type="success">
-                                    说明
-                                </Typography.Text>{" "}
-                                以上三个通用属性
-                            </>,
-                            <>
-                                变量何时可见, 以及其值的变化是靠后面的{" "}
-                                <Typography.Text type="success">
-                                    变量数据
-                                </Typography.Text>{" "}
-                                决定的
-                            </>,
-                            <>
-                                变量数据有两个属性{" "}
-                                <Typography.Text type="success">
-                                    值所在步骤
-                                </Typography.Text>{" "}
-                                和变量具体的{" "}
-                                <Typography.Text type="success">
-                                    值
-                                </Typography.Text>{" "}
-                                本身.
-                            </>,
-
-                            <>
-                                顾名思义, 就是该变量, 在{" "}
-                                <Typography.Text type="success">
-                                    值所在步骤
-                                </Typography.Text>{" "}
-                                时{" "}
-                                <Typography.Text type="success">
-                                    值
-                                </Typography.Text>{" "}
-                                是多少.
-                            </>,
-                            <>
-                                <Typography.Text type="success">
-                                    值所在步骤
-                                </Typography.Text>{" "}
-                                对应了上面在步骤列表定义步骤时所显示的序号(从0开始).
-                            </>,
-                            '例如, 变量名写为 a , 变量类型写为 int , 说明写为"这是一个整型变量",',
-                            "然后变量属性中, 值所在步骤写为 1, 值写为 10, 这代表, 在步骤1时, 变量a的值为10, 在步骤1之后, a变量值不会发生改变, 直到再次定义其值.",
-                            <>
-                                如果变量的值被定义为{" "}
-                                <Typography.Text type="success">
-                                    $end
-                                </Typography.Text>{" "}
-                                , 则该变量被删除(模拟离开作用于, 或使用delate)
-                            </>,
-                        ]}
-                    />
-                </>
-            ),
-            showProgress: true,
-            pauseOnHover: true,
-        });
-    };
     return (
         <div>
             <Typography.Title level={3}>
                 程序执行演示器
                 <Button
                     type="link"
-                    onClick={openNotification}
+                    onClick={() =>
+                        openNotification(notifyApi, () => {
+                            try {
+                                fetch("./P1498 南蛮图腾 程序演示.json").then(
+                                    async (response) => {
+                                        if (!response.ok) {
+                                            throw new Error(
+                                                `HTTP error! Status: ${response.status}`
+                                            );
+                                        }
+                                        const data = await response.json();
+                                        importData(data);
+                                    }
+                                );
+                            } catch (error) {
+                                console.error("Error fetching data:", error);
+                            }
+                        })
+                    }
                     icon={<QuestionOutlined />}
                 />
             </Typography.Title>
@@ -653,7 +702,10 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
                         {demonstrator.params
                             ?.filter(
                                 (param) =>
-                                    stepsDate.cyrrentStepNumber in param.value
+                                    stepsDate.cyrrentStepNumber in
+                                        param.value &&
+                                    param.value[stepsDate.cyrrentStepNumber] !==
+                                        "$end"
                             )
                             .map((param, index) => (
                                 <Card
@@ -667,6 +719,7 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
                     </Splitter.Panel>
                 </Splitter>
                 <Flex gap={15}>
+                    <Button onClick={handleReset}>重新开始</Button>
                     <Button onClick={handlePrevLine}>上一步</Button>
                     <Button onClick={handleNextLine}>下一步</Button>
                 </Flex>

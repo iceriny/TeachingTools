@@ -92,26 +92,21 @@ class TExecuteDemonstrator extends Tool<
      */
     nextStep(): [number, number] {
         this.currentStep++;
-        return [
-            this.steps[this.currentStep] ?? this.currentLine++,
-            this.currentStep,
-        ];
+        return [this.steps[this.currentStep], this.currentStep];
     }
     /**
      * 将当前步骤重置为0
      */
     initStep() {
         this._currentStep = 0;
+        return [this.steps[this.currentStep], 0];
     }
     /**
      * @returns 上一步步骤的行号
      */
     prevStep(): [number, number] {
         this.currentStep--;
-        return [
-            this.steps[this.currentStep] ?? this.currentLine--,
-            this.currentStep,
-        ];
+        return [this.steps[this.currentStep], this.currentStep];
     }
 }
 const instance = TExecuteDemonstrator.getInstance({
