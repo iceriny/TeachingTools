@@ -1,6 +1,6 @@
 import type { Breakpoint } from "antd";
 import { Grid } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const { useBreakpoint: useAntdBreakpoint } = Grid;
 
