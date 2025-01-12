@@ -710,7 +710,7 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
                             .map((param, index) => (
                                 <Card
                                     key={`param_${index}`}
-                                    title={param.paramName}
+                                    title={`${param.paramName} <${param.description}>`}
                                     style={{ whiteSpace: "pre-wrap" }}
                                 >
                                     {param.value[stepsDate.cyrrentStepNumber]}
