@@ -1,7 +1,7 @@
 {
     "name": "teaching-tools",
     "private": true,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "module",
     "repository": {
         "url": "https://github.com/iceriny/TeachingTools"

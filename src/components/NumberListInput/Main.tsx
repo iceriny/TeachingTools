@@ -42,7 +42,11 @@ const Main: React.FC<NumberListInputProps> = ({
     const [length, setLength] = useState<number>(2);
 
     const handlePressEnter = (_: number, index: number) => {
-        document.getElementById("input-" + (index + 2))?.focus();
+        const target = document.getElementById(
+            "input-" + (index + 2)
+        )! as HTMLInputElement;
+        target.focus();
+        target.select();
     };
     const handleChange = useCallback(
         (value: number, index: number) => {

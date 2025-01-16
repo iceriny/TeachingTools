@@ -50,6 +50,7 @@ const SingleNumberInput: React.FC<SingleNumberInputProps> = ({
             defaultValue={defaultValue}
             value={value}
             addonBefore={`${index}`}
+            parser={(v) => parseInt(v as string)}
             type="number"
             size="small"
             placeholder="行号"
