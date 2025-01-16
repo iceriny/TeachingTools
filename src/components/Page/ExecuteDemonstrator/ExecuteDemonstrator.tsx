@@ -1,5 +1,4 @@
 // import SyntaxHighlighter from "react-syntax-highlighter";
-import { blue } from "@ant-design/colors";
 import {
     CloseOutlined,
     DownOutlined,
@@ -15,9 +14,10 @@ import {
     Form,
     Input,
     InputNumber,
+    notification,
     Skeleton,
+    Slider,
     Space,
-    Splitter,
     theme,
     Typography,
 } from "antd";
@@ -32,12 +32,11 @@ import React, {
 // 动态加载组件
 const SyntaxHighlighter = React.lazy(() => import("react-syntax-highlighter"));
 
-import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
-import type { CodeBlocksParams } from "../../../Tools/TExecuteDemonstrator";
-import NumberListInput from "../../NumberListInput";
-import { breakpointComparative, useBreakpoint } from "../../Utilities";
-import Paragraphs from "../../Paragraphs";
 import type { NotificationInstance } from "antd/es/notification/interface";
+import type { CodeBlocksParams } from "../../../Tools/TExecuteDemonstrator";
+import TExecuteDemonstrator from "../../../Tools/TExecuteDemonstrator";
+import NumberListInput from "../../NumberListInput";
+import Paragraphs from "../../Paragraphs";
 
 const { useToken } = theme;
 
@@ -234,13 +233,17 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
 
     const { token } = useToken();
     const [code, setCode] = useState<string>(demonstrator._code);
+    const [codeFontSize, setCodeFontSize] = useState<number>(1);
     const [codeSteps, setCodeSteps] = useState<number[]>([]);
     const [stepsDate, setStepsDate] = useState<{
         currentLine: number;
         cyrrentStepNumber: number;
     }>({ currentLine: 0, cyrrentStepNumber: 0 });
     const [langType, setLangType] = useState<keyof typeof langTypeLabel>("cpp");
-    const screens = useBreakpoint();
+
+    const [api, contextHolder] = notification.useNotification({
+        stack: { threshold: 6 },
+    });
 
     const handleCodeChange: (event: SyntheticEvent) => void = (event) => {
         if (!event) return;
@@ -269,6 +272,39 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
             cyrrentStepNumber: step,
         });
     };
+    const handlePramsDisplay: () => void = () => {
+        // const cardsInfo = demonstrator.params?.filter(
+        //     (param) => stepsDate.cyrrentStepNumber in param.value
+        // );
+        for (const [index, info] of demonstrator.params.entries()) {
+            if (
+                info.value[stepsDate.cyrrentStepNumber] !== "$end" &&
+                stepsDate.cyrrentStepNumber in info.value
+            ) {
+                const card = info.value[stepsDate.cyrrentStepNumber];
+                api.open({
+                    key: `param_${info.paramName}`,
+                    message: <b>{`${info.paramName} <${info.description}>`}</b>,
+                    description: card,
+                    duration: null,
+                    placement: index < 6 ? "topRight" : "topLeft",
+                    style: { width: "20rem" },
+                });
+            } else {
+                api.destroy(`param_${info.paramName}`);
+            }
+        }
+    };
+    useEffect(() => {
+        handlePramsDisplay();
+        const element = document.getElementById(
+            `code-line-${stepsDate.currentLine}`
+        );
+        console.log(element);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }, [stepsDate]);
     const handleFormSubmit: FormProps["onFinish"] = (value) => {
         const codeBlockParams: CodeBlockParamsType = value[
             "code-input"
@@ -299,7 +335,6 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
                     }
                 }
             }
-            console.log(varListTemp);
             return {
                 paramName: item.varName,
                 value: varListTemp,
@@ -364,6 +399,7 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
         });
     }, []);
 
+    // 监听键盘事件(上一步下一步)
     const keyDownListenerAdded = useRef(false);
     useEffect(() => {
         if (!keyDownListenerAdded.current) {
@@ -390,6 +426,7 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
 
     return (
         <div>
+            {contextHolder}
             <Typography.Title level={3}>
                 程序执行演示器
                 <Button
@@ -638,7 +675,7 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
                     </Form.List>
                 </Flex>
                 <Divider />
-                <Flex gap={15}>
+                <Flex gap={15} align="center">
                     <Button type="primary" htmlType="submit">
                         提交
                     </Button>
@@ -648,80 +685,84 @@ const ExecuteDemonstrator: React.FC<ExecuteDemonstratorProps> = ({
                     <Button type="primary" onClick={handleExportData}>
                         保存数据
                     </Button>
+                    <Typography.Text>代码字体大小：</Typography.Text>
+                    <Slider
+                        style={{ width: "20rem" }}
+                        defaultValue={1}
+                        min={1}
+                        max={4}
+                        onChange={(value) => {
+                            setCodeFontSize(value);
+                        }}
+                    />
                 </Flex>
                 <Divider />
             </Form>
 
             <Flex vertical gap="middle">
-                <Splitter
-                    layout={
-                        breakpointComparative(screens, "md")
-                            ? "horizontal"
-                            : "vertical"
-                    }
+                <div
                     style={{
-                        minHeight: "150px",
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                        marginLeft: 15,
+                        marginRight: 15,
                     }}
                 >
-                    <Splitter.Panel defaultSize="60%" min="20%" max="70%">
-                        <div style={{ marginLeft: 15, marginRight: 15 }}>
-                            {code == "" || code == undefined ? (
-                                <Desc text="Code Display" />
-                            ) : (
-                                <Suspense fallback={<Skeleton />}>
-                                    <SyntaxHighlighter
-                                        language={langType}
-                                        showLineNumbers={true}
-                                        wrapLines={true} // 必须启用以支持逐行包装
-                                        lineProps={(lineNumber: number) => ({
-                                            // onClick: () => handleLineClick(lineNumber),
-                                            style: {
-                                                backgroundColor:
-                                                    lineNumber ==
-                                                    stepsDate.currentLine
-                                                        ? blue[2]
-                                                        : "transparent",
-                                                padding: "3px 10px 3px 3px",
-                                                margin:
-                                                    lineNumber ==
-                                                    stepsDate.currentLine
-                                                        ? "50px 0 100px 0"
-                                                        : 0,
-                                                borderRadius: "5px",
-                                            },
-                                        })}
-                                    >
-                                        {code}
-                                    </SyntaxHighlighter>
-                                </Suspense>
-                            )}
-                        </div>
-                    </Splitter.Panel>
-                    <Splitter.Panel>
-                        {demonstrator.params
-                            ?.filter(
-                                (param) =>
-                                    stepsDate.cyrrentStepNumber in
-                                        param.value &&
-                                    param.value[stepsDate.cyrrentStepNumber] !==
-                                        "$end"
-                            )
-                            .map((param, index) => (
-                                <Card
-                                    key={`param_${index}`}
-                                    title={`${param.paramName} <${param.description}>`}
-                                    style={{ whiteSpace: "pre-wrap" }}
-                                >
-                                    {param.value[stepsDate.cyrrentStepNumber]}
-                                </Card>
-                            ))}
-                    </Splitter.Panel>
-                </Splitter>
+                    {code == "" || code == undefined ? (
+                        <Desc text="Code Display" />
+                    ) : (
+                        <Suspense fallback={<Skeleton />}>
+                            <SyntaxHighlighter
+                                language={langType}
+                                showLineNumbers={true}
+                                wrapLines={true} // 必须启用以支持逐行包装
+                                wrapLongLines
+                                lineProps={(lineNumber: number) => ({
+                                    id: `code-line-${lineNumber}`,
+                                    // onClick: () => handleLineClick(lineNumber),
+                                    style: {
+                                        display: "block",
+                                        backgroundColor:
+                                            lineNumber == stepsDate.currentLine
+                                                ? token.colorPrimaryHover
+                                                : "transparent",
+                                        padding: "3px 10px 3px 3px",
+                                        // margin:
+                                        //     lineNumber == stepsDate.currentLine
+                                        //         ? "5px 0 5px 0"
+                                        //         : 0,
+                                        borderRadius: token.borderRadius,
+                                        fontSize: `${codeFontSize}rem`,
+                                        transition: "all 0.3s ease-in-out",
+                                    },
+                                })}
+                            >
+                                {code}
+                            </SyntaxHighlighter>
+                        </Suspense>
+                    )}
+                </div>
                 <Flex gap={15}>
-                    <Button onClick={handleReset}>重新开始</Button>
-                    <Button onClick={handlePrevLine}>上一步</Button>
-                    <Button onClick={handleNextLine}>下一步</Button>
+                    <Button
+                        disabled={stepsDate.currentLine == 0}
+                        onClick={handleReset}
+                    >
+                        重新开始
+                    </Button>
+                    <Button disabled={code === ""} onClick={handlePrevLine}>
+                        上一步
+                    </Button>
+                    <Button disabled={code === ""} onClick={handleNextLine}>
+                        下一步
+                    </Button>
+                    <Button
+                        disabled={demonstrator.params?.length === 0}
+                        onClick={() => {
+                            for (const p of demonstrator.params) {
+                                api.destroy(`param_${p.paramName}`);
+                            }
+                        }}
+                    >
+                        隐藏变量卡片
+                    </Button>
                 </Flex>
             </Flex>
         </div>
