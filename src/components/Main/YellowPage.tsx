@@ -1,5 +1,6 @@
 import type { TagProps } from "antd";
-import { Space, Tag, theme, Tooltip } from "antd";
+import { Input, Space, Tag, theme, Tooltip } from "antd";
+import type { MouseEventHandler } from "react";
 import { useRef } from "react";
 
 interface ItemProps {
@@ -8,12 +9,13 @@ interface ItemProps {
     link: string;
     description?: string;
     tags?: (string | { color: TagProps["color"]; text: string })[];
+    action?: (args: any[]) => void;
 }
 const { useToken } = theme;
-function LinkItem({ label, icon, link, description, tags }: ItemProps) {
+function LinkItem({ label, icon, link, description, tags, action }: ItemProps) {
     const { token } = useToken();
     const aRef = useRef<HTMLAnchorElement>(null);
-    const handleClick = () => {
+    const handleClick: MouseEventHandler<HTMLDivElement> = () => {
         aRef.current?.click();
     };
     return (
@@ -58,6 +60,17 @@ function LinkItem({ label, icon, link, description, tags }: ItemProps) {
                         </Tag>
                     ))}
                 </Space>
+                {!!action && (
+                    <Input
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                        placeholder="请输入洛谷题号"
+                        onPressEnter={(event) => {
+                            action(event.currentTarget.value.split(","));
+                        }}
+                    />
+                )}
                 <a ref={aRef} href={link} target="_blank" hidden />
             </Space>
         </Tooltip>
@@ -82,6 +95,16 @@ const Items: ItemProps[] = [
         link: "https://www.luogu.com.cn/",
         description: "c++做题网站,提供在线提交代码和检测.",
         tags: ["测试", "c++", "学习"],
+        action: (args) => {
+            // 判断是否是字符串;
+            if (typeof args[0] === "string") {
+                if (args[0].startsWith("http")) {
+                    window.open(args[0]);
+                } else {
+                    window.open(`https://www.luogu.com.cn/problem/${args[0]}`);
+                }
+            }
+        },
     },
     {
         label: "ChatGPT",
