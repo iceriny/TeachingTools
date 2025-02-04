@@ -7,7 +7,7 @@ interface ItemProps {
     label: React.ReactNode;
     icon?: React.ReactNode;
     link: string;
-    description?: string;
+    description?: React.ReactNode;
     tags?: (string | { color: TagProps["color"]; text: string })[];
     action?: (args: any[]) => void;
 }
@@ -107,6 +107,32 @@ const Items: ItemProps[] = [
         },
     },
     {
+        label: "Github",
+        link: "https://github.com/",
+        description: (
+            <>
+                世界上最大的
+                <Tooltip title="点击查看什么叫代码托管平台">
+                    <a
+                        style={{ color: "#FDA200" }}
+                        href="https://worktile.com/kb/ask/30814.html"
+                    >
+                        代码托管平台
+                    </a>
+                </Tooltip>
+                . 也是最大的开源软件托管的平台.
+            </>
+        ),
+        tags: [
+            "工具",
+            "代码托管平台",
+            "Github",
+            "开源软件",
+            { color: "warning", text: "需要账号" },
+            { color: "warning", text: "可能需要翻墙" },
+        ],
+    },
+    {
         label: "ChatGPT",
         link: "https://chatgpt.com/",
         description:
@@ -117,6 +143,13 @@ const Items: ItemProps[] = [
             "大规模语言模型",
             { color: "warning", text: "需要翻墙" },
         ],
+    },
+    {
+        label: "DeepSeek",
+        link: "https://chat.deepseek.com/",
+        description:
+            "由幻方量化开发的黑马大语言模型, 其强大的推理能力快速的吸引大量注册者, 目前因为过于火爆时常出现服务器错误, 好不好用看运气和时段, 早上一般好用的. !! 一定要开 深度思考 开关才好用.",
+        tags: ["工具", "AI", "大规模语言模型"],
     },
     {
         label: "通义千问",
